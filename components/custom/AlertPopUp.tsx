@@ -39,17 +39,17 @@ const AlertPopUp = ({
       <AlertDialogTrigger disabled={disabled} asChild className={className}>
         {children}
       </AlertDialogTrigger>
-      <AlertDialogContent className="max-w-[90vw]">
+      <AlertDialogContent className="max-w-[90vw] w-fit">
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+        <AlertDialogFooter className="flex ">
+          <AlertDialogCancel className="flex-1">Cancelar</AlertDialogCancel>
           <AlertDialogAction
             onClick={action}
             disabled={disabled}
-            className="bg-destructive hover:opacity-90 text-white"
+            className="flex-1 bg-destructive hover:opacity-90 text-white"
           >
             Continuar
           </AlertDialogAction>
