@@ -3,6 +3,7 @@ import { hasRole } from "@/helpers/checkAuthorization";
 import { usePathname, useRouter } from "next/navigation"; // Usando o hook do next/navigation
 import { useEffect, useState } from "react";
 import { Menubar, MenubarMenu, MenubarTrigger } from "../ui/menubar";
+import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 
 export function HeaderMenu() {
   const pathname = usePathname(); // Acessa o pathname atual
@@ -15,7 +16,6 @@ export function HeaderMenu() {
   }, []);
   // Verifique a rota atual para aplicar a classe "active"
   const isTerritoriesActive = pathname === "/";
-  const isDashboardActive = pathname === "/dashboard";
   const isCadastrosActive = pathname === "/cadastros";
   const isDesignacoesActive = pathname === "/designacoes";
   const isPerfilActive = pathname === "/perfil";
@@ -25,46 +25,49 @@ export function HeaderMenu() {
   };
 
   return (
-    <Menubar className="max-w-fit mx-auto">
-      <MenubarMenu>
-        <MenubarTrigger
-          className="cursor-pointer"
-          data-state={isTerritoriesActive ? "open" : "closed"}
-          onClick={() => handleNavigation("/")}
-        >
-          Territórios
-        </MenubarTrigger>
-      </MenubarMenu>
-      <MenubarMenu>
-        <MenubarTrigger
-          className="cursor-pointer"
-          data-state={isDesignacoesActive ? "open" : "closed"}
-          onClick={() => handleNavigation("/designacoes")}
-        >
-          Designações
-        </MenubarTrigger>
-      </MenubarMenu>
-
-      {isAdmin && (
+    <ScrollArea className="pb-3 sm:p-0">
+      <Menubar className="max-w-fit mx-auto">
         <MenubarMenu>
           <MenubarTrigger
             className="cursor-pointer"
-            data-state={isCadastrosActive ? "open" : "closed"}
-            onClick={() => handleNavigation("/cadastros")}
+            data-state={isTerritoriesActive ? "open" : "closed"}
+            onClick={() => handleNavigation("/")}
           >
-            Cadastros
+            Territórios
           </MenubarTrigger>
         </MenubarMenu>
-      )}
-      <MenubarMenu>
-        <MenubarTrigger
-          className="cursor-pointer"
-          data-state={isPerfilActive ? "open" : "closed"}
-          onClick={() => handleNavigation("/perfil")}
-        >
-          Perfil
-        </MenubarTrigger>
-      </MenubarMenu>
-    </Menubar>
+        <MenubarMenu>
+          <MenubarTrigger
+            className="cursor-pointer"
+            data-state={isDesignacoesActive ? "open" : "closed"}
+            onClick={() => handleNavigation("/designacoes")}
+          >
+            Designações
+          </MenubarTrigger>
+        </MenubarMenu>
+
+        {isAdmin && (
+          <MenubarMenu>
+            <MenubarTrigger
+              className="cursor-pointer"
+              data-state={isCadastrosActive ? "open" : "closed"}
+              onClick={() => handleNavigation("/cadastros")}
+            >
+              Cadastros
+            </MenubarTrigger>
+          </MenubarMenu>
+        )}
+        <MenubarMenu>
+          <MenubarTrigger
+            className="cursor-pointer"
+            data-state={isPerfilActive ? "open" : "closed"}
+            onClick={() => handleNavigation("/perfil")}
+          >
+            Perfil
+          </MenubarTrigger>
+        </MenubarMenu>
+        <ScrollBar orientation="horizontal" />
+      </Menubar>
+    </ScrollArea>
   );
 }

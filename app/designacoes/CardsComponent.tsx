@@ -121,7 +121,7 @@ export const CardsComponent = () => {
                       title="Ver o território"
                       onClick={() => router.push(`/?id=${territory._id}`)}
                     >
-                      <Eye size={18} />
+                      <Eye size={16} />
                     </Button>
                     <span>
                       <Button
@@ -135,13 +135,15 @@ export const CardsComponent = () => {
                       </Button>
                     </span>
                   </TableCell>
-                  <TableCell className="text-nowrap">
+                  <TableCell className="text-nowrap text-sm">
                     <span className={`${statusMap.get(territory.status || "")?.style} font-medium`}>
                       {statusMap.get(territory.status || "")?.value}
                     </span>
                   </TableCell>
-                  <TableCell className="text-nowrap">Território {territory.number}</TableCell>
-                  <TableCell className="text-nowrap">
+                  <TableCell className="text-nowrap text-sm">
+                    Território {territory.number}
+                  </TableCell>
+                  <TableCell className="text-nowrap text-sm">
                     {territory?.responsible?.name || "-"}
                   </TableCell>
                 </TableRow>

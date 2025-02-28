@@ -12,9 +12,6 @@ export async function GET(req: Request) {
   try {
     await connectToDB();
 
-    // Obtém todos os territórios
-    const territories = await Territory.find();
-
     // Faz o count agrupando por status
     const statusCounts = await Territory.aggregate([
       { $group: { _id: "$status", count: { $sum: 1 } } },
@@ -34,7 +31,7 @@ export async function GET(req: Request) {
 
 // Atualizar status de um território (PUT)
 export async function PUT(req: NextRequest) {
-  const user = await withAuth(req, ["admin", "elder"]);
+  const user = await withAuth(req);
   if (user instanceof NextResponse) return user;
   try {
     await connectToDB();
@@ -45,6 +42,7 @@ export async function PUT(req: NextRequest) {
     if (!mongoose.models.Neighborhood) {
       await import("@/app/api/models/neighborhood.model");
     }
+
     const updatedTerritory = await Territory.findByIdAndUpdate(
       id,
       { status, information, id_responsible },
@@ -56,8 +54,8 @@ export async function PUT(req: NextRequest) {
     if (!updatedTerritory)
       return NextResponse.json({ error: "Território não encontrado" }, { status: 404 });
 
-    // Se o status for "done", cria um registro na tabela TerritoryLog
-    if (status === "done") {
+    // Se o status for "done" ou "ongoing", cria um registro na tabela TerritoryLog
+    if (status === "done" || status === "ongoing") {
       await Territory.findByIdAndUpdate(
         id,
 
@@ -67,7 +65,9 @@ export async function PUT(req: NextRequest) {
       await TerritoryLog.create({
         territory: id,
         user: user.id, // Pegando o ID do usuário autenticado
-        timestamp: data,
+        data: data || new Date(),
+        status,
+        information,
       });
     }
 

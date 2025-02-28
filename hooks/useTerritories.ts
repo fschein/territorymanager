@@ -54,7 +54,7 @@ export const useTerritories = () => {
           status: string;
           information?: string;
           id_responsible?: string;
-          date?: Date;
+          data?: Date;
         }) => {
           const response = await api.put<TerritoryProps>(`/territories/status`, data);
           return response.data;

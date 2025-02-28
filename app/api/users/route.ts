@@ -10,7 +10,7 @@ export async function POST(req: Request) {
 
   try {
     await connectToDB();
-    const { name, email, password, role } = await req.json();
+    const { name, email, password, role, phone_number } = await req.json();
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ name, email, password: hashedPassword, role });
+    const newUser = new User({ name, email, password: hashedPassword, role, phone_number });
 
     await newUser.save();
     return NextResponse.json({ message: "Usuário criado com sucesso!" }, { status: 201 });
@@ -32,7 +32,7 @@ export async function GET(req: Request) {
   if (user instanceof NextResponse) return user;
   try {
     await connectToDB();
-    const users = await User.find();
+    const users = await User.find({ role: { $ne: "admin" } });
     return NextResponse.json(users, { status: 200 });
   } catch (error) {
     return NextResponse.json({ error: "Erro ao buscar usuários", details: error }, { status: 500 });

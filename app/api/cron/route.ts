@@ -14,7 +14,7 @@ export async function GET(req: Request) {
     await connectToDB();
 
     const today = new Date();
-    const thresholdDate = subDays(today, 45); // Data limite (hoje - 45 dias)
+    const thresholdDate = subDays(today, 60); // Data limite (hoje - 45 dias)
 
     // Busca territórios que não tiveram logs nos últimos 45 dias
     const outdatedTerritories = await Territory.find().lean();

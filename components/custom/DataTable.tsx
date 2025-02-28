@@ -204,7 +204,7 @@ export function DataTable<TData, TValue>({
               {isLoading ? (
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   <span className="flex gap-2 w-full items-center justify-center">
-                    <FaSpinner size={18} className="me-2 animate-spin" /> Carregando...
+                    <FaSpinner size={16} className="me-2 animate-spin" /> Carregando...
                   </span>
                 </TableCell>
               ) : (

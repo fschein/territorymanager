@@ -32,7 +32,7 @@ export default function Cadastros() {
           headerTitle="Digite a nova senha"
           minLength={5}
         >
-          <KeyIcon size={18} className="me-2" />
+          <KeyIcon size={16} className="me-2" />
           Atualizar senha
         </ButtonMotivation>
       </section>

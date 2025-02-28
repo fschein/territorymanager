@@ -30,11 +30,11 @@ export const ModalUsers = ({
 
   return (
     <Dialog open={modalOpen} onOpenChange={closeModal}>
-      <DialogContent className="p-4">
-        <DialogTitle className="font-medium text-lg">Usuários</DialogTitle>
+      <DialogContent className="p-4 max-w-[90vw] w-fit">
+        <DialogTitle className="font-medium text-lg">Responsáveis</DialogTitle>
         <Table divClassname="border rounded-md max-h-[40vh] scroll-thin">
           <TableHeader>
-            <TableRow className="uppercase">
+            <TableRow className="uppercase text-nowrap">
               <TableHead>Nome</TableHead>
               <TableHead>Telefone</TableHead>
               <TableHead>Ação</TableHead>
@@ -42,22 +42,22 @@ export const ModalUsers = ({
           </TableHeader>
           <TableBody>
             {users?.map((user) => (
-              <TableRow key={user?._id} className="uppercase">
+              <TableRow key={user?._id} className="uppercase text-nowrap">
                 <TableCell>{normalizeFirstAndLastName(user?.name)}</TableCell>
                 <TableCell>{normalizePhoneNumber(user?.phone_number)}</TableCell>
                 <TableCell>
                   <AlertPopUp
-                    title={`Deseja realmente esse território para ${normalizeFirstAndLastName(
+                    title={`Deseja realmente designar esse território para ${normalizeFirstAndLastName(
                       user?.name
                     )}?`}
                     description="Esse terrítório será marcado como pendente e esse irmão ficará responsável por ele."
                     action={() => {
                       setStatus({ id, status: "assigned", id_responsible: user._id });
-                      window.open(`https://wa.me/${user?.phone_number}`, "_blank");
+                      window.open(`https://wa.me/55${user?.phone_number}`, "_blank");
                     }}
                   >
                     <Button size={"sm"} title="Enviar mensagem" disabled={setStatusIsPending}>
-                      <FaWhatsapp size={18} />
+                      <FaWhatsapp size={16} />
                     </Button>
                   </AlertPopUp>
                 </TableCell>

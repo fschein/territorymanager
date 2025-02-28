@@ -39,7 +39,7 @@ const AlertPopUp = ({
       <AlertDialogTrigger disabled={disabled} asChild className={className}>
         {children}
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent className="max-w-[90vw]">
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>

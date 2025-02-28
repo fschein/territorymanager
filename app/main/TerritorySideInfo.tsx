@@ -169,29 +169,36 @@ const TerritorySideInfo = ({
             <SheetFooter className="flex gap-2">
               <SheetClose asChild>
                 <Button variant={"secondary"} onClick={removeFeature} disabled={isPending}>
-                  <Ban size={18} className="me-2" />
+                  <Ban size={16} className="me-2" />
                   Fechar
                 </Button>
               </SheetClose>
               <Button onClick={onSubmit} disabled={isPending}>
-                <Save size={18} className="me-2" />
+                <Save size={16} className="me-2" />
                 Salvar
               </Button>
             </SheetFooter>
           )}
         </div>
-        {hasRole(["admin", "elder"]) && id && (
+        {id && (
           <div className="flex justify-between gap-2">
             <span>
-              <Button
-                variant={"secondary"}
-                className="bg-slate-300 dark:text-slate-600"
-                title="Designar"
-                onClick={sendTerritory}
-              >
-                <Forward size={20} />
-              </Button>
-              <ModalUsers modalOpen={modalUserOpen} closeModal={() => setModalUserOpen(false)} />
+              {hasRole(["admin", "elder"]) && (
+                <>
+                  <Button
+                    variant={"secondary"}
+                    className="bg-slate-300 dark:text-slate-600"
+                    title="Designar"
+                    onClick={sendTerritory}
+                  >
+                    <Forward size={20} />
+                  </Button>
+                  <ModalUsers
+                    modalOpen={modalUserOpen}
+                    closeModal={() => setModalUserOpen(false)}
+                  />
+                </>
+              )}
             </span>
             <span className="flex gap-2">
               <ButtonMotivation
@@ -209,7 +216,7 @@ const TerritorySideInfo = ({
                 title="Concluido"
                 headerTitle="Dia que foi concluído"
                 description="Esse terrítório será marcado como concluído"
-                action={(date) => setStatus({ id, status: "done", date })}
+                action={(data) => setStatus({ id, status: "done", data })}
               >
                 <CircleCheck size={20} />
               </ButtonDate>

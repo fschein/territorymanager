@@ -107,7 +107,7 @@ const InputWithLabel = ({
               iconLeft ? "rounded-l-md" : `rounded-r-md `
             } ${iconClass}`}
           >
-            <Icon size={18} />
+            <Icon size={16} />
           </Button>
         )}
       </span>
@@ -265,7 +265,7 @@ const FormInput = ({
                       iconLeft ? "rounded-l-md" : `rounded-r-md `
                     } ${iconClass}`}
                   >
-                    <Icon size={18} />
+                    <Icon size={16} />
                   </Button>
                 )}
               </div>

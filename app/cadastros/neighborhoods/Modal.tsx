@@ -65,12 +65,14 @@ const ModalNeighborhood = () => {
   useEffect(() => {
     if (insertOneIsSuccess) {
       handleClickCancel();
+      closeModal();
     }
   }, [insertOneIsPending]);
 
   useEffect(() => {
     if (updateIsSuccess) {
       handleClickCancel();
+      closeModal();
     }
   }, [updateIsPending]);
 
@@ -79,7 +81,7 @@ const ModalNeighborhood = () => {
     <Dialog open={modalOpen} onOpenChange={closeModal}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{id ? `Grupo:` : "Novo Grupo"}</DialogTitle>
+          <DialogTitle>{id ? `Bairro:` : "Novo Bairro"}</DialogTitle>
           <DialogDescription className="hidden"></DialogDescription>
         </DialogHeader>
         <div className="flex gap-2">
@@ -102,18 +104,18 @@ const ModalNeighborhood = () => {
                 onClick={handleClickCancel}
                 disabled={isPending}
               >
-                <Ban size={18} className="me-2" />
+                <Ban size={16} className="me-2" />
                 Cancelar
               </Button>
               <Button size={"sm"} onClick={handleSubmit} disabled={isPending}>
                 {isPending ? (
                   <>
-                    <FaSpinner size={18} className="me-2 animate-spin" />
+                    <FaSpinner size={16} className="me-2 animate-spin" />
                     Salvando...
                   </>
                 ) : (
                   <>
-                    <Save size={18} className="me-2" />
+                    <Save size={16} className="me-2" />
                     Salvar
                   </>
                 )}
@@ -121,7 +123,7 @@ const ModalNeighborhood = () => {
             </>
           ) : (
             <Button variant={"warning"} onClick={() => editModal(true)}>
-              <Pen size={18} className="me-2" />
+              <Pen size={16} className="me-2" />
               Editar
             </Button>
           )}

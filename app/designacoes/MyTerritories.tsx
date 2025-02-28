@@ -49,7 +49,7 @@ export const MyTerritories = () => {
                       title="Ver o território"
                       onClick={() => router.push(`/?id=${territory._id}`)}
                     >
-                      <Eye size={18} />
+                      <Eye size={16} />
                     </Button>
                     <ButtonMotivation
                       variant={"warning"}
@@ -60,7 +60,7 @@ export const MyTerritories = () => {
                       isTextarea
                       action={(info) => setStatus({ id, status: "ongoing", information: info })}
                     >
-                      <CircleDashed size={18} />
+                      <CircleDashed size={16} />
                     </ButtonMotivation>
                     <ButtonDate
                       variant={"success"}
@@ -68,18 +68,20 @@ export const MyTerritories = () => {
                       headerTitle="Dia que foi concluído"
                       size={"xs"}
                       description="Esse terrítório será marcado como concluído"
-                      action={(date) => setStatus({ id, status: "done", date })}
+                      action={(data) => setStatus({ id, status: "done", data })}
                     >
-                      <CircleCheck size={18} />
+                      <CircleCheck size={16} />
                     </ButtonDate>
                   </TableCell>
-                  <TableCell className="text-nowrap">
+                  <TableCell className="text-nowrap text-sm">
                     <span className={`${statusMap.get(territory.status || "")?.style} font-medium`}>
                       {statusMap.get(territory.status || "")?.value}
                     </span>
                   </TableCell>
-                  <TableCell className="text-nowrap">Território {territory.number}</TableCell>
-                  <TableCell className="text-nowrap">
+                  <TableCell className="text-nowrap text-sm">
+                    Território {territory.number}
+                  </TableCell>
+                  <TableCell className="text-nowrap text-sm">
                     {territory?.responsible?.name || "-"}
                   </TableCell>
                 </TableRow>

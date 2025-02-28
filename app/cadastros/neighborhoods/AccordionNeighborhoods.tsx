@@ -30,7 +30,7 @@ export const AccordionNeighborhoods = () => {
         <AccordionContent className="flex flex-col gap-2 p-0 pt-3">
           <div className="flex justify-end">
             <Button onClick={() => openModal("")}>
-              <Plus size={18} className="me-2" />
+              <Plus size={16} className="me-2" />
               Adicionar Bairro
             </Button>
           </div>
