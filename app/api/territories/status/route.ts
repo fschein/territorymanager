@@ -24,7 +24,8 @@ export async function GET(req: Request) {
     });
 
     return NextResponse.json({ ...statusSummary }, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Erro ao buscar territórios:", error.message);
     return NextResponse.json({ error: "Erro ao buscar territórios" }, { status: 500 });
   }
 }
@@ -51,8 +52,7 @@ export async function PUT(req: NextRequest) {
       .populate("id_group")
       .populate("id_neighborhood");
 
-    if (!updatedTerritory)
-      return NextResponse.json({ error: "Território não encontrado" }, { status: 404 });
+    if (!updatedTerritory) throw new Error("Território não encontrado");
 
     // Se o status for "done" ou "ongoing", cria um registro na tabela TerritoryLog
     if (status === "done" || status === "ongoing") {
@@ -72,7 +72,8 @@ export async function PUT(req: NextRequest) {
     }
 
     return NextResponse.json(updatedTerritory, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Erro ao atualizar status do território:", error.message);
     return NextResponse.json(
       { error: "Erro ao atualizar status do território", details: error },
       { status: 400 }

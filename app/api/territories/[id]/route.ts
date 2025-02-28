@@ -29,7 +29,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     if (!territoryWithGroupAndNeighborhood)
       return NextResponse.json({ error: "Território não encontrado" }, { status: 404 });
     return NextResponse.json(territoryWithGroupAndNeighborhood, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Erro ao buscar território:", error.message);
     return NextResponse.json(
       { error: "Erro ao buscar território", details: error },
       { status: 500 }
@@ -55,7 +56,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     if (!updatedTerritory)
       return NextResponse.json({ error: "Território não encontrado" }, { status: 404 });
     return NextResponse.json(updatedTerritory, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Erro ao atualizar território:", error.message);
     return NextResponse.json(
       { error: "Erro ao atualizar território", details: error },
       { status: 400 }
@@ -74,7 +76,9 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     if (!deletedTerritory)
       return NextResponse.json({ error: "Território não encontrado" }, { status: 404 });
     return NextResponse.json({ message: "Território deletado com sucesso" }, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Erro ao deletar território:", error.message);
+
     return NextResponse.json(
       { error: "Erro ao deletar território", details: error },
       { status: 500 }

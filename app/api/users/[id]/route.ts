@@ -21,7 +21,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     if (!foundUser) return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 });
 
     return NextResponse.json(foundUser, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Erro ao buscar usuário:", error.message);
     return NextResponse.json({ error: "Erro ao buscar usuário", details: error }, { status: 500 });
   }
 }
@@ -64,7 +65,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const updatedUser = await User.findByIdAndUpdate(id, updateData, { new: true });
 
     return NextResponse.json(updatedUser, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Erro ao atualizar usuário:", error.message);
     return NextResponse.json(
       { error: "Erro ao atualizar usuário", details: error },
       { status: 500 }
@@ -82,7 +84,8 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 
     await User.findByIdAndDelete(id);
     return NextResponse.json({ message: "Usuário deletado com sucesso!" }, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Erro ao deletar usuário:", error.message);
     return NextResponse.json({ error: "Erro ao deletar usuário", details: error }, { status: 500 });
   }
 }

@@ -14,7 +14,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     if (!neighborhood)
       return NextResponse.json({ error: "Bairro não encontrado" }, { status: 404 });
     return NextResponse.json(neighborhood, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ error: "Erro ao buscar bairro", details: error }, { status: 500 });
   }
 }
@@ -31,7 +31,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     if (!updatedNeighborhood)
       return NextResponse.json({ error: "Bairro não encontrado" }, { status: 404 });
     return NextResponse.json(updatedNeighborhood, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json(
       { error: "Erro ao atualizar bairro", details: error },
       { status: 500 }
@@ -48,7 +48,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     if (!deletedNeighborhood)
       return NextResponse.json({ error: "Bairro não encontrado" }, { status: 404 });
     return NextResponse.json({ message: "Bairro deletado com sucesso" }, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ error: "Erro ao deletar bairro", details: error }, { status: 500 });
   }
 }

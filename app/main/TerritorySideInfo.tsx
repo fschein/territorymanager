@@ -28,7 +28,6 @@ import { useStoreTerritory } from "./store";
 const url = process.env.NEXT_PUBLIC_URL;
 
 const initialFormValues: TerritoryProps = {
-  _id: "",
   number: "",
   id_neighborhood: "",
   id_group: "",
@@ -56,16 +55,32 @@ const TerritorySideInfo = ({
   const { mutate: update, isPending: updateIsPending } = useTerritories().update();
   const { mutate: setStatus } = useTerritories().setStatus();
 
-  function onSubmit() {
-    if (id) {
-      update({ data: formData, id });
-    } else {
-      insertOne({
-        ...formData,
-        coordinates,
-      });
+  async function onSubmit() {
+    try {
+      if (!formData.coordinates) {
+        throw new Error("Coordenadas inválidas!");
+      }
+      if (!formData.id_group) {
+        throw new Error("Selecione um grupo!");
+      }
+      if (!formData.id_neighborhood) {
+        throw new Error("Selecione um bairro!");
+      }
+      if (!formData.number) {
+        throw new Error("Informe o número do território!");
+      }
+      if (id) {
+        update({ data: formData, id });
+      } else {
+        insertOne({
+          ...formData,
+          coordinates,
+        });
+      }
+      closeSideInfo();
+    } catch (error: any) {
+      toast.error(error.message);
     }
-    closeSideInfo();
   }
 
   function handleClose() {

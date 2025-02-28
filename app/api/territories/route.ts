@@ -62,7 +62,8 @@ export async function GET(req: Request) {
       );
     });
     return NextResponse.json(territoriesWithGroupAndNeighborhood, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Erro ao buscar territórios:", error.message.message);
     return NextResponse.json(
       { error: "Erro ao buscar territórios", details: error },
       { status: 500 }
@@ -80,7 +81,8 @@ export async function POST(req: NextRequest) {
     const newTerritory = new Territory(body);
     await newTerritory.save();
     return NextResponse.json(newTerritory, { status: 201 });
-  } catch (error) {
+  } catch (error:any) {
+    console.error("Erro ao criar território:", error.message);
     return NextResponse.json(
       { error: "Erro ao criar território", details: error },
       { status: 400 }

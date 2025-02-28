@@ -177,7 +177,7 @@ var NodeTypingsInstaller = class extends typescript_exports.server.typingsInstal
         this.log.writeLine(`    Succeeded. stdout:${indent(typescript_exports.sys.newLine, stdout)}`);
       }
       return false;
-    } catch (error) {
+    } catch (error:any) {
       const { stdout, stderr } = error;
       this.log.writeLine(`    Failed. stdout:${indent(typescript_exports.sys.newLine, stdout)}${typescript_exports.sys.newLine}    stderr:${indent(typescript_exports.sys.newLine, stderr)}`);
       return true;

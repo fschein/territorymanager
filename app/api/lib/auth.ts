@@ -35,7 +35,7 @@ export async function withAuth(req: Request, allowedRoles?: string | string[]) {
     }
 
     return user;
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ error: "Erro na autenticação.", details: error }, { status: 500 });
   }
 }

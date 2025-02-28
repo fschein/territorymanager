@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     const newGroup = new Group({ name, color });
     await newGroup.save();
     return NextResponse.json(newGroup, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ error: "Erro ao criar grupo", details: error }, { status: 500 });
   }
 }
@@ -27,7 +27,7 @@ export async function GET(req: Request) {
     await connectToDB();
     const groups = await Group.find();
     return NextResponse.json(groups, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ error: "Erro ao buscar grupos", details: error }, { status: 500 });
   }
 }

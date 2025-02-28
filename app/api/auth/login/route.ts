@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     );
 
     return NextResponse.json({ token, user }, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ error: "Erro ao realizar login", details: error }, { status: 500 });
   }
 }

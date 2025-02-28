@@ -13,20 +13,18 @@ export async function GET(req: Request) {
   try {
     await connectToDB();
 
-    const today = new Date();
-    const thresholdDate = subDays(today, 60); // Data limite (hoje - 45 dias)
+    const thresholdDays = parseInt(process.env.TERRITORY_LOG_THRESHOLD_DAYS || "60", 10);
+    const thresholdDate = subDays(new Date(), thresholdDays);
 
-    // Busca territórios que não tiveram logs nos últimos 45 dias
     const outdatedTerritories = await Territory.find().lean();
 
     const territoriesToUpdate = [];
     for (const territory of outdatedTerritories) {
       const lastLog = await TerritoryLog.findOne({ id_territory: territory._id })
-        .sort({ date: -1 }) // Pega o log mais recente
+        .sort({ date: -1 })
         .lean();
 
       if (!lastLog || Array.isArray(lastLog) || isBefore(new Date(lastLog.date), thresholdDate)) {
-        // Se não tem log ou o último log foi há mais de 45 dias, atualizar
         territoriesToUpdate.push(territory._id);
       }
     }
@@ -42,8 +40,8 @@ export async function GET(req: Request) {
       message: "Cron job executada com sucesso",
       updatedCount: territoriesToUpdate.length,
     });
-  } catch (error) {
-    console.error("Erro na cron job:", error);
+  } catch (error: any) {
+    console.error("Erro na cron job:", error.message);
     return NextResponse.json({ error: "Erro interno" }, { status: 500 });
   }
 }

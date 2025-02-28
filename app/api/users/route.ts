@@ -22,7 +22,8 @@ export async function POST(req: Request) {
 
     await newUser.save();
     return NextResponse.json({ message: "Usuário criado com sucesso!" }, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Erro ao criar usuário:", error.message);
     return NextResponse.json({ error: "Erro ao criar usuário", details: error }, { status: 500 });
   }
 }
@@ -34,7 +35,8 @@ export async function GET(req: Request) {
     await connectToDB();
     const users = await User.find({ role: { $ne: "admin" } });
     return NextResponse.json(users, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Erro ao buscar usuários:", error.message);
     return NextResponse.json({ error: "Erro ao buscar usuários", details: error }, { status: 500 });
   }
 }

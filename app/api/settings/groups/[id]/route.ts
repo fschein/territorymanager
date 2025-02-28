@@ -15,7 +15,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     if (!group) return NextResponse.json({ error: "Grupo não encontrado" }, { status: 404 });
 
     return NextResponse.json(group, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ error: "Erro ao buscar grupo", details: error }, { status: 500 });
   }
 }
@@ -38,7 +38,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     }
 
     return NextResponse.json(updatedGroup, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ error: "Erro ao atualizar grupo", details: error }, { status: 500 });
   }
 }
@@ -53,7 +53,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     if (!deletedGroup) return NextResponse.json({ error: "Grupo não encontrado" }, { status: 404 });
 
     return NextResponse.json({ message: "Grupo deletado com sucesso" }, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ error: "Erro ao deletar grupo", details: error }, { status: 500 });
   }
 }

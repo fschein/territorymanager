@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     const newNeighborhood = new Neighborhood({ name });
     await newNeighborhood.save();
     return NextResponse.json(newNeighborhood, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ error: "Erro ao criar bairro", details: error }, { status: 500 });
   }
 }
@@ -26,7 +26,7 @@ export async function GET(req: Request) {
     await connectToDB();
     const neighborhoods = await Neighborhood.find();
     return NextResponse.json(neighborhoods, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ error: "Erro ao buscar bairros", details: error }, { status: 500 });
   }
 }
