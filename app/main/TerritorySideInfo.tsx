@@ -101,7 +101,7 @@ const TerritorySideInfo = ({
 
     navigator.clipboard
       .writeText(mensagem)
-      .then(() => toast("Mensagem copiada!"))
+      .then(() => toast.info("Mensagem copiada!"))
       .catch((err) => toast.error("Erro ao copiar a mensagem:", err));
     setModalUserOpen(true);
   }

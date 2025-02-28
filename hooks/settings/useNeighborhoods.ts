@@ -1,6 +1,7 @@
 import { NeighborhoodProps } from "@/types/NeighborhoodProps";
 import api from "@/utils/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export const useNeighborhoods = () => {
   const queryClient = useQueryClient();
@@ -38,6 +39,10 @@ export const useNeighborhoods = () => {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["settings"] });
         },
+        onError: (error: any) => {
+          const message = error?.response?.data?.error;
+          toast.error(message);
+        },
       });
     },
     update: () => {
@@ -49,6 +54,10 @@ export const useNeighborhoods = () => {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["settings"] });
         },
+        onError: (error: any) => {
+          const message = error?.response?.data?.error;
+          toast.error(message);
+        },
       });
     },
     deleteOne: () => {
@@ -58,6 +67,10 @@ export const useNeighborhoods = () => {
         },
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["settings"] });
+        },
+        onError: (error: any) => {
+          const message = error?.response?.data?.error;
+          toast.error(message);
         },
       });
     },

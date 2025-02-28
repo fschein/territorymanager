@@ -1,6 +1,7 @@
 import { UserProps } from "@/types/UserProps";
 import api from "@/utils/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 // Interface para os usuários
 
@@ -36,6 +37,10 @@ export const useUsers = () => {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["users"] });
         },
+        onError: (error: any) => {
+          const message = error?.response?.data?.error;
+          toast.error(message);
+        },
       });
     },
     update: () => {
@@ -47,6 +52,10 @@ export const useUsers = () => {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["users"] });
         },
+        onError: (error: any) => {
+          const message = error?.response?.data?.error;
+          toast.error(message);
+        },
       });
     },
     deleteOne: () => {
@@ -56,6 +65,10 @@ export const useUsers = () => {
         },
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["users"] });
+        },
+        onError: (error: any) => {
+          const message = error?.response?.data?.error;
+          toast.error(message);
         },
       });
     },

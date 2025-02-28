@@ -1,6 +1,7 @@
 import { TerritoryProps } from "@/types/TerritoryProps";
 import api from "@/utils/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export const useTerritories = () => {
   const queryClient = useQueryClient();
@@ -34,6 +35,10 @@ export const useTerritories = () => {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["territories"] });
         },
+        onError: (error: any) => {
+          const message = error?.response?.data?.error;
+          toast.error(message);
+        },
       });
     },
     update: () => {
@@ -44,6 +49,10 @@ export const useTerritories = () => {
         },
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["territories"] });
+        },
+        onError: (error: any) => {
+          const message = error?.response?.data?.error;
+          toast.error(message);
         },
       });
     },
@@ -61,6 +70,10 @@ export const useTerritories = () => {
         },
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["territories"] });
+        },
+        onError: (error: any) => {
+          const message = error?.response?.data?.error;
+          toast.error(message);
         },
       });
     },
@@ -80,6 +93,10 @@ export const useTerritories = () => {
         },
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["territories"] });
+        },
+        onError: (error: any) => {
+          const message = error?.response?.data?.error;
+          toast.error(message);
         },
       });
     },

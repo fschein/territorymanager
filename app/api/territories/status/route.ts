@@ -70,7 +70,6 @@ export async function PUT(req: NextRequest) {
         information,
       });
     }
-
     return NextResponse.json(updatedTerritory, { status: 200 });
   } catch (error: any) {
     console.error("Erro ao atualizar status do território:", error.message);

@@ -1,6 +1,7 @@
 import { GroupProps } from "@/types/GroupProps";
 import api from "@/utils/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export const useGroups = () => {
   const queryClient = useQueryClient();
@@ -35,6 +36,10 @@ export const useGroups = () => {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["settings"] });
         },
+        onError: (error: any) => {
+          const message = error?.response?.data?.error;
+          toast.error(message);
+        },
       });
     },
     update: () => {
@@ -46,6 +51,10 @@ export const useGroups = () => {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["settings"] });
         },
+        onError: (error: any) => {
+          const message = error?.response?.data?.error;
+          toast.error(message);
+        },
       });
     },
     deleteOne: () => {
@@ -55,6 +64,10 @@ export const useGroups = () => {
         },
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["settings"] });
+        },
+        onError: (error: any) => {
+          const message = error?.response?.data?.error;
+          toast.error(message);
         },
       });
     },
