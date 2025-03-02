@@ -8,7 +8,7 @@ import { Layers } from "lucide-react";
 import mapboxgl, { Map } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import TerritorySideInfo from "./TerritorySideInfo";
 import { useStoreTerritory } from "./store";
 
@@ -23,18 +23,12 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const map = useRef<Map | null>(null);
   const draw = useRef<MapboxDraw | null>(null);
-  const { data: territoriesGetAll, isSuccess } = useTerritories().getAll();
-  const { data: territoriesGetOne } = useTerritories().getOne(id || "");
+  const { data: territories, isSuccess, isPending } = useTerritories().getAll({ filters: { id } });
   const openSideInfo = useStoreTerritory().openSideInfo;
   const mapStyle = useStoreTerritory().mapStyle;
   const toggleMapStyle = useStoreTerritory().toggleMapStyle;
   const [styleLoaded, setStyleLoaded] = useState(false);
   const [isClient, setIsClient] = useState(false);
-
-  const territories = useMemo(
-    () => (id ? [territoriesGetOne] : territoriesGetAll),
-    [territoriesGetAll, territoriesGetOne]
-  );
 
   useEffect(() => {
     setIsClient(true); // Definir como true quando o componente for renderizado no cliente
@@ -73,6 +67,9 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
       // geolocate.trigger();
       loadTerritories();
     });
+
+    //* DESABILITA DOUBBLE CLICK ZOOM
+    map.current.doubleClickZoom.disable();
 
     //* CRIAÇÃO DE POLÍGONO
     map.current.on("draw.create", (e: { features: mapboxgl.MapboxGeoJSONFeature[] }) => {
@@ -234,8 +231,19 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
       });
 
       // Evento de clique nos polígonos
-      map.current.on("click", "poligonos-fill", handlePolygonClick);
-      map.current.on("touchend", "poligonos-fill", handlePolygonClick);
+      // map.current.on("click", "poligonos-fill", handlePolygonClick);
+      // map.current.on("touchend", "poligonos-fill", handlePolygonClick);
+      map.current.on("dblclick", "poligonos-fill", handlePolygonClick);
+      let lastTap = 0;
+
+      map.current.on("touchend", "poligonos-fill", (e) => {
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - lastTap;
+        if (tapLength < 300 && tapLength > 0) {
+          handlePolygonClick(e);
+        }
+        lastTap = currentTime;
+      });
 
       function handlePolygonClick(e: any) {
         if (!e.features || e.features.length === 0) return;
@@ -271,7 +279,7 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
     if (territories && territories.length > 0 && territories[0] && isSuccess) {
       loadTerritories();
     }
-  }, [territories, styleLoaded, isClient, isSuccess]);
+  }, [territories, territories && territories[0], styleLoaded, isClient, isSuccess, isPending]);
 
   const deleteSelectedPolygon = () => {
     if (draw.current) {

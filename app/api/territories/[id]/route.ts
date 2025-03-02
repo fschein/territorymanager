@@ -44,8 +44,14 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   if (user instanceof NextResponse) return user;
   try {
     await connectToDB();
-    const id = (await params).id;
+    const paramsData = await params;
+    const id = paramsData.id;
     const body = await req.json();
+    // Verificando se já existe um território com o mesmo número
+    const existingTerritory = await Territory.findOne({ number: body.number });
+    if (existingTerritory) {
+      throw new Error(`Território com o número ${body.number} já existe`);
+    }
     const updatedTerritory = await Territory.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
@@ -58,10 +64,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     return NextResponse.json(updatedTerritory, { status: 200 });
   } catch (error: any) {
     console.error("Erro ao atualizar território:", error.message);
-    return NextResponse.json(
-      { error: "Erro ao atualizar território", details: error },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: error.message, details: error }, { status: 400 });
   }
 }
 

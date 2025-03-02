@@ -37,7 +37,9 @@ export const useTerritories = () => {
         },
         onError: (error: any) => {
           const message = error?.response?.data?.error;
-          toast.error(message);
+          toast.error("Erro ao criar território", {
+            description: message,
+          });
         },
       });
     },
@@ -52,7 +54,9 @@ export const useTerritories = () => {
         },
         onError: (error: any) => {
           const message = error?.response?.data?.error;
-          toast.error(message);
+          toast.error("Erro ao atualizar território", {
+            description: message,
+          });
         },
       });
     },
@@ -73,7 +77,9 @@ export const useTerritories = () => {
         },
         onError: (error: any) => {
           const message = error?.response?.data?.error;
-          toast.error(message);
+          toast.error("Erro ao atualizar o status do território", {
+            description: message,
+          });
         },
       });
     },

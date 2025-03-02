@@ -16,6 +16,7 @@ export interface Actions {
   openSideInfo: (props: { id: string; coordinates?: CoordinatesProps }) => void;
   closeSideInfo: () => void;
   toggleMapStyle: () => void;
+  setIdTerritory: (id: string) => void;
   setTerritory: (territory?: TerritoryProps) => void;
 }
 
@@ -33,6 +34,7 @@ export const useStoreTerritory = create<State & Actions>()(
       closeSideInfo: () => {
         set({ id: "", sideInfoOpen: false, coordinates: [], territory: null });
       },
+      setIdTerritory: (id: string) => set({ id }),
 
       toggleMapStyle: () => {
         set((state) => ({

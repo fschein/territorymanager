@@ -33,7 +33,7 @@ export const MyTerritories = () => {
               <TableHead>Ações</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Nome</TableHead>
-              <TableHead>Responsável</TableHead>
+              <TableHead>Responsáveis</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -82,7 +82,7 @@ export const MyTerritories = () => {
                     Território {territory.number}
                   </TableCell>
                   <TableCell className="text-nowrap text-sm">
-                    {territory?.responsible?.name || "-"}
+                    {territory?.responsibles?.map((res) => res.name).join(", ") || "-"}
                   </TableCell>
                 </TableRow>
               );

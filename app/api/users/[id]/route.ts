@@ -37,7 +37,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const id = (await params).id;
 
     // O usuário comum pode editar apenas seu próprio perfil (name e email)
-    if (user.role !== "admin" && user.id !== id) {
+    if (user.role !== "admin" && user._id !== id) {
       return NextResponse.json({ error: "Acesso negado." }, { status: 403 });
     }
     const updateData: {

@@ -36,7 +36,8 @@ export async function PUT(req: NextRequest) {
   if (user instanceof NextResponse) return user;
   try {
     await connectToDB();
-    const { id, status, information, id_responsible, data } = await req.json();
+    let { id, status, information, id_responsible, data } = await req.json();
+
     if (!mongoose.models.Group) {
       await import("@/app/api/models/group.model");
     }
@@ -44,11 +45,33 @@ export async function PUT(req: NextRequest) {
       await import("@/app/api/models/neighborhood.model");
     }
 
-    const updatedTerritory = await Territory.findByIdAndUpdate(
-      id,
-      { status, information, id_responsible },
-      { new: true, runValidators: true }
-    )
+    // Primeiro, busque o território atual para verificar o status antes da atualização
+    const currentTerritory = await Territory.findById(id);
+    if (!currentTerritory) {
+      throw new Error("Território não encontrado");
+    }
+
+    // Verifique se o status atual é "ongoing" e o novo status é "assigned" para evitar a mudança
+    if (currentTerritory.status === "ongoing" && status === "assigned") {
+      status = currentTerritory.status; // Mantém o status atual (ongoing)
+    }
+
+    const updateFields: any = { status, information };
+
+    // Se for "assigned", adiciona o responsável no array (sem duplicação)
+    if (id_responsible) {
+      updateFields.$addToSet = { responsibles: id_responsible };
+    }
+
+    // Se for "done", esvazia o array de responsáveis
+    if (status === "done") {
+      updateFields.responsibles = [];
+    }
+
+    const updatedTerritory = await Territory.findByIdAndUpdate(id, updateFields, {
+      new: true,
+      runValidators: true,
+    })
       .populate("id_group")
       .populate("id_neighborhood");
 
@@ -56,12 +79,6 @@ export async function PUT(req: NextRequest) {
 
     // Se o status for "done" ou "ongoing", cria um registro na tabela TerritoryLog
     if (status === "done" || status === "ongoing") {
-      await Territory.findByIdAndUpdate(
-        id,
-
-        { id_responsible: null },
-        { new: true, runValidators: true }
-      );
       await TerritoryLog.create({
         territory: id,
         user: user.id, // Pegando o ID do usuário autenticado
@@ -70,12 +87,10 @@ export async function PUT(req: NextRequest) {
         information,
       });
     }
+
     return NextResponse.json(updatedTerritory, { status: 200 });
   } catch (error: any) {
     console.error("Erro ao atualizar status do território:", error.message);
-    return NextResponse.json(
-      { error: "Erro ao atualizar status do território", details: error },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: error.message, details: error }, { status: 400 });
   }
 }

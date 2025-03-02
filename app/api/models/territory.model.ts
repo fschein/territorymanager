@@ -7,7 +7,7 @@ export interface TerritoryDocument extends Document {
   coordinates: [number, number][][];
   information?: string;
   status: "assigned" | "ongoing" | "done" | "urgent";
-  id_responsible?: Types.ObjectId;
+  responsibles: Types.ObjectId[];
 }
 
 // Definição do schema
@@ -26,7 +26,7 @@ const territorySchema = new Schema<TerritoryDocument>({
     default: "assigned",
     required: true,
   },
-  id_responsible: { type: Schema.Types.ObjectId, ref: "User" },
+  responsibles: [{ type: Schema.Types.ObjectId, ref: "User" }],
 });
 
 // Criando o modelo

@@ -24,6 +24,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ModalUsers } from "../main/ModalUsers";
+import { useStoreTerritory } from "../main/store";
 
 const url = process.env.NEXT_PUBLIC_URL;
 
@@ -31,6 +32,7 @@ export const CardsComponent = () => {
   const router = useRouter();
   const [statusList, setStatusList] = useState<string[]>(["urgent", "ongoing", "assigned", "done"]);
   const [modalUserOpen, setModalUserOpen] = useState(false);
+  const setIdTerritory = useStoreTerritory().setIdTerritory;
 
   const { data: territories } = useTerritories().getAll({ filters: { statusList } });
   const { data: cardTerritoriesData } = useTerritories().getCountStatus();
@@ -90,12 +92,13 @@ export const CardsComponent = () => {
               <TableHead>Ações</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Nome</TableHead>
-              <TableHead>Responsável</TableHead>
+              <TableHead>Responsáveis</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {territories?.map((territory) => {
               async function sendTerritory() {
+                setIdTerritory(territory._id || "");
                 const number = territory?.number;
                 const mensagem =
                   `${url}/?id=${territory._id}\n\n` +
@@ -107,7 +110,7 @@ export const CardsComponent = () => {
 
                 navigator.clipboard
                   .writeText(mensagem)
-                  .then(() => toast("Mensagem copiada!"))
+                  .then(() => toast.info("Mensagem copiada!"))
                   .catch((err) => toast.error("Erro ao copiar a mensagem:", err));
                 setModalUserOpen(true);
               }
@@ -144,7 +147,7 @@ export const CardsComponent = () => {
                     Território {territory.number}
                   </TableCell>
                   <TableCell className="text-nowrap text-sm">
-                    {territory?.responsible?.name || "-"}
+                    {territory?.responsibles?.map((res) => res.name).join(", ") || "-"}
                   </TableCell>
                 </TableRow>
               );

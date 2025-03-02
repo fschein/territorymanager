@@ -32,20 +32,23 @@ export async function GET(req: Request) {
       }
     });
 
+    // Extraindo id (se presente)
+    const id = searchParams.get("filters[id]");
+
     // Construindo o filtro
     const query: any = {};
-    if (id_responsible) query.id_responsible = id_responsible;
+    if (id_responsible) query.responsibles = { $in: [id_responsible] };
     if (statusList.length > 0) query.status = { $in: statusList };
+    if (id) query._id = id;
 
     const territories = await Territory.find(query)
       .populate("id_group")
       .populate("id_neighborhood")
-      .populate("id_responsible");
+      .populate({ path: "responsibles", strictPopulate: false });
     const territoriesWithGroupAndNeighborhood = territories.map((territory) => ({
       ...territory.toObject(),
       group: territory.id_group,
       neighborhood: territory.id_neighborhood,
-      responsible: territory.id_responsible,
     }));
     const statusOrder = {
       urgent: 1,
@@ -63,7 +66,7 @@ export async function GET(req: Request) {
     });
     return NextResponse.json(territoriesWithGroupAndNeighborhood, { status: 200 });
   } catch (error: any) {
-    console.error("Erro ao buscar territórios:", error.message.message);
+    console.error("Erro ao buscar territórios:", error.message);
     return NextResponse.json(
       { error: "Erro ao buscar territórios", details: error },
       { status: 500 }
@@ -78,14 +81,16 @@ export async function POST(req: NextRequest) {
   try {
     await connectToDB();
     const body = await req.json();
+    // Verificando se já existe um território com o mesmo número
+    const existingTerritory = await Territory.findOne({ number: body.number });
+    if (existingTerritory) {
+      throw new Error(`Território com o número ${body.number} já existe`);
+    }
     const newTerritory = new Territory(body);
     await newTerritory.save();
     return NextResponse.json(newTerritory, { status: 201 });
-  } catch (error:any) {
+  } catch (error: any) {
     console.error("Erro ao criar território:", error.message);
-    return NextResponse.json(
-      { error: "Erro ao criar território", details: error },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: error.message, details: error }, { status: 400 });
   }
 }

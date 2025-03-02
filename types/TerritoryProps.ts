@@ -12,8 +12,7 @@ export interface TerritoryProps {
   neighborhood?: NeighborhoodProps;
   coordinates: [number, number][][];
   status?: "assigned" | "ongoing" | "done" | "urgent";
-  id_responsible?: string;
-  responsible?: UserProps;
+  responsibles?: UserProps[];
 }
 
 export const statusMap = new Map([

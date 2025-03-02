@@ -51,8 +51,16 @@ const TerritorySideInfo = ({
 
   const { data, isLoading } = useTerritories().getOne(id);
   const [formData, setFormData] = useState<TerritoryProps>(initialFormValues);
-  const { mutate: insertOne, isPending: insertOneIsPending } = useTerritories().insertOne();
-  const { mutate: update, isPending: updateIsPending } = useTerritories().update();
+  const {
+    mutate: insertOne,
+    isPending: insertOneIsPending,
+    isSuccess: insertOneIsSuccess,
+  } = useTerritories().insertOne();
+  const {
+    mutate: update,
+    isPending: updateIsPending,
+    isSuccess: updateIsSuccess,
+  } = useTerritories().update();
   const { mutate: setStatus } = useTerritories().setStatus();
 
   async function onSubmit() {
@@ -77,7 +85,6 @@ const TerritorySideInfo = ({
           coordinates,
         });
       }
-      closeSideInfo();
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -89,6 +96,15 @@ const TerritorySideInfo = ({
       removeFeature();
     }
   }
+
+  useEffect(() => {
+    if (insertOneIsSuccess) handleClose();
+  }, [insertOneIsPending]);
+
+  useEffect(() => {
+    if (updateIsSuccess) handleClose();
+  }, [updateIsPending]);
+
   async function sendTerritory() {
     const number = data?.number;
     const mensagem =
