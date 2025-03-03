@@ -237,11 +237,17 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
       let lastTap = 0;
 
       map.current.on("touchend", "poligonos-fill", (e) => {
+        if (e.originalEvent.touches.length > 0 || e.originalEvent.changedTouches.length > 1) {
+          return; // Se houver mais de um toque, não faz nada (ignora zoom)
+        }
+
         const currentTime = new Date().getTime();
         const tapLength = currentTime - lastTap;
+
         if (tapLength < 300 && tapLength > 0) {
           handlePolygonClick(e);
         }
+
         lastTap = currentTime;
       });
 
