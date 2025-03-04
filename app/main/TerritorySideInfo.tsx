@@ -108,7 +108,7 @@ const TerritorySideInfo = ({
   async function sendTerritory() {
     const number = data?.number;
     const mensagem =
-      `${url}/?id=${data?._id}\n\n` +
+      `${url}/?number=${data?.number}\n\n` +
       `*Olá!* 😁\n` +
       `Você foi designado para o território *${number}*.\n` +
       `Acesse o link acima para conferir todos os detalhes.\n` +

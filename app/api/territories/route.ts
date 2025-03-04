@@ -32,14 +32,14 @@ export async function GET(req: Request) {
       }
     });
 
-    // Extraindo id (se presente)
-    const id = searchParams.get("filters[id]");
+    // Extraindo número do território (se presente)
+    const number = searchParams.get("filters[number]");
 
     // Construindo o filtro
     const query: any = {};
     if (id_responsible) query.responsibles = { $in: [id_responsible] };
     if (statusList.length > 0) query.status = { $in: statusList };
-    if (id) query._id = id;
+    if (number) query.number = number;
 
     const territories = await Territory.find(query)
       .populate("id_group")
