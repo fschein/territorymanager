@@ -38,8 +38,8 @@ export async function GET(req: Request) {
 
     const users = await User.find({
       role: { $ne: "admin" },
-      ...(search ? { name: { $regex: search, $options: "i" } } : {}),
-    });
+      name: { $regex: search || "", $options: "i" },
+    }).sort({ name: 1 });
 
     return NextResponse.json(users, { status: 200 });
   } catch (error: any) {
