@@ -33,7 +33,14 @@ export async function GET(req: Request) {
   if (user instanceof NextResponse) return user;
   try {
     await connectToDB();
-    const users = await User.find({ role: { $ne: "admin" } });
+    const { searchParams } = new URL(req.url);
+    const search = searchParams.get("filters[search]");
+
+    const users = await User.find({
+      role: { $ne: "admin" },
+      ...(search ? { name: { $regex: search, $options: "i" } } : {}),
+    });
+
     return NextResponse.json(users, { status: 200 });
   } catch (error: any) {
     console.error("Erro ao buscar usuários:", error.message);

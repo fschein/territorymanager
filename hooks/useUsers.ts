@@ -1,6 +1,6 @@
 import { UserProps } from "@/types/UserProps";
 import api from "@/utils/api";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 // Interface para os usuários
@@ -9,11 +9,12 @@ export const useUsers = () => {
   const queryClient = useQueryClient();
 
   return {
-    getAll: () => {
+    getAll: (params?: { filters?: unknown }) => {
       return useQuery({
-        queryKey: ["users", "list"],
+        queryKey: ["users", "list", [params]],
+        placeholderData: keepPreviousData,
         queryFn: async () => {
-          const response = await api.get<UserProps[]>("/users");
+          const response = await api.get<UserProps[]>("/users", { params });
           return response.data;
         },
       });
