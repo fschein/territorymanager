@@ -18,12 +18,16 @@ mapboxgl.accessToken = TOKEN;
 
 function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
   const searchParams = useSearchParams();
-  const id = searchParams.get("id");
+  const number = searchParams.get("number");
 
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const map = useRef<Map | null>(null);
   const draw = useRef<MapboxDraw | null>(null);
-  const { data: territories, isSuccess, isPending } = useTerritories().getAll({ filters: { id } });
+  const {
+    data: territories,
+    isSuccess,
+    isPending,
+  } = useTerritories().getAll({ filters: { number } });
   const openSideInfo = useStoreTerritory().openSideInfo;
   const mapStyle = useStoreTerritory().mapStyle;
   const toggleMapStyle = useStoreTerritory().toggleMapStyle;
@@ -273,7 +277,7 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
 
         map.current.fitBounds(bounds, {
           padding: 40,
-          maxZoom: id ? 18 : 16,
+          maxZoom: number ? 18 : 16,
           duration: 1000,
         });
       }
