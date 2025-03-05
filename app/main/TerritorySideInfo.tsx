@@ -94,6 +94,7 @@ const TerritorySideInfo = ({
     closeSideInfo();
     if (!id) {
       removeFeature();
+      setFormData(initialFormValues);
     }
   }
 
