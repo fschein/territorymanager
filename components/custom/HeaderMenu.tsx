@@ -12,7 +12,7 @@ export function HeaderMenu() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    setIsAdmin(hasRole(["admin", "elder"])); // Garante que só roda no cliente
+    setIsAdmin(hasRole(["admin"])); // Garante que só roda no cliente
   }, []);
   // Verifique a rota atual para aplicar a classe "active"
   const isTerritoriesActive = pathname === "/";
