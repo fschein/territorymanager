@@ -238,6 +238,7 @@ const TerritorySideInfo = ({
                 headerTitle="Digite o que foi concluido"
                 placeholder="Feito apenas o lado..."
                 isTextarea
+                value={formData.information}
                 action={(info) => setStatus({ id, status: "ongoing", information: info })}
               >
                 <CircleDashed size={20} />

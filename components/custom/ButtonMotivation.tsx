@@ -25,6 +25,7 @@ type ButtonMotivationProps = ButtonProps & {
   isTextarea?: boolean;
   inputType?: "text" | "password" | "number" | string;
   minLength?: number;
+  value?: string;
 };
 
 const ButtonMotivation = ({
@@ -43,14 +44,15 @@ const ButtonMotivation = ({
   isTextarea,
   inputType = "text",
   minLength = 10,
+  value = "",
 }: ButtonMotivationProps) => {
-  const [motivo, setMotivo] = useState<string>("");
+  const [motivo, setMotivo] = useState<string>(value);
   const actionDisabled = equalText
     ? motivo !== String(placeholder).toUpperCase()
     : !motivo || motivo.length < minLength;
 
   return (
-    <AlertDialog>
+    <AlertDialog onOpenChange={(open) => !open && setMotivo(value || "")}>
       <AlertDialogTrigger type="button" asChild>
         <Button
           title={title}
