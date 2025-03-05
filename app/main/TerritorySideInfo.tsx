@@ -90,12 +90,14 @@ const TerritorySideInfo = ({
     }
   }
 
+  console.log(formData);
+
   function handleClose() {
     closeSideInfo();
     if (!id) {
       removeFeature();
-      setFormData(initialFormValues);
     }
+    setFormData(initialFormValues);
   }
 
   useEffect(() => {
