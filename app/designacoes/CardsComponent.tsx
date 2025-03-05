@@ -1,5 +1,6 @@
 "use client";
 
+import AlertPopUp from "@/components/custom/AlertPopUp";
 import { SelectMultiStatus } from "@/components/custom/SelectStatus";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { hasRole } from "@/helpers/checkAuthorization";
 import { useTerritories } from "@/hooks/useTerritories";
 import { statusMap } from "@/types/TerritoryProps";
 import {
@@ -19,9 +21,10 @@ import {
   CircleDotDashed,
   Eye,
   Forward,
+  Trash,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ModalUsers } from "../main/ModalUsers";
 import { useStoreTerritory } from "../main/store";
@@ -36,6 +39,13 @@ export const CardsComponent = () => {
 
   const { data: territories } = useTerritories().getAll({ filters: { statusList } });
   const { data: cardTerritoriesData } = useTerritories().getCountStatus();
+  const { mutate: deleteTerritory } = useTerritories().deleteOne();
+
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    setIsAdmin(hasRole(["admin"])); // Garante que só roda no cliente
+  }, []);
 
   return (
     <section className="flex gap-4 flex-col">
@@ -126,17 +136,29 @@ export const CardsComponent = () => {
                     >
                       <Eye size={16} />
                     </Button>
-                    <span>
+                    <Button
+                      variant={"secondary"}
+                      className="bg-slate-300 dark:text-slate-600"
+                      title="Designar"
+                      size={"xs"}
+                      onClick={sendTerritory}
+                    >
+                      <Forward size={20} />
+                    </Button>
+                    <AlertPopUp
+                      title={`Deseja realmente remover esse território?`}
+                      description="Esse terrítório será definitivamente removido do servidor."
+                      action={() => deleteTerritory(territory._id || "")}
+                    >
                       <Button
-                        variant={"secondary"}
-                        className="bg-slate-300 dark:text-slate-600"
-                        title="Designar"
+                        className="border-0 px-2 py-1 text-xs"
                         size={"xs"}
-                        onClick={sendTerritory}
+                        variant={"destructive"}
+                        title="Ver o território"
                       >
-                        <Forward size={20} />
+                        <Trash size={16} />
                       </Button>
-                    </span>
+                    </AlertPopUp>
                   </TableCell>
                   <TableCell className="text-nowrap text-sm">
                     <span className={`${statusMap.get(territory.status || "")?.style} font-medium`}>
