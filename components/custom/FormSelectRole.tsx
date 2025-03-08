@@ -15,7 +15,7 @@ type Toption = {
   value: string;
   label: string;
 };
-interface IFormSelectColor {
+interface IFormSelectRole {
   name?: string;
   type?: string;
   control?: Control<any>;
@@ -33,42 +33,17 @@ interface IFormSelectColor {
   onChange?: (id?: string) => void;
 }
 
-export const colorOptions: Toption[] = [
+export const roleOptions: Toption[] = [
   {
-    value: "#f5b041",
-    label: "Laranja",
+    value: "elder",
+    label: "Ancião",
   },
   {
-    value: "#ec7063",
-    label: "Vermelho",
-  },
-  {
-    value: "#5dade2",
-    label: "Azul",
-  },
-  {
-    value: "#a569bd",
-    label: "Roxo",
-  },
-  {
-    value: "#5d6d7e",
-    label: "Cinza",
-  },
-  {
-    value: "#58d68d",
-    label: "Verde",
-  },
-  {
-    value: "#f4d03f",
-    label: "Amarelo",
-  },
-
-  {
-    value: "#34495e",
-    label: "Azul Escuro",
+    value: "user",
+    label: "Usuário",
   },
 ];
-const FormSelectColor = ({
+const FormSelectRole = ({
   name,
   type,
 
@@ -84,7 +59,7 @@ const FormSelectColor = ({
 
   value,
   onChange,
-}: IFormSelectColor) => {
+}: IFormSelectRole) => {
   if (control && name) {
     return (
       <FormField
@@ -115,21 +90,15 @@ const FormSelectColor = ({
                     Todos(as)
                   </SelectItem>
                 )}
-                {colorOptions &&
-                  colorOptions.map((option) => {
+                {roleOptions &&
+                  roleOptions.map((option) => {
                     return (
                       <SelectItem
                         key={option.value}
                         value={option.value}
                         className="cursor-pointer"
                       >
-                        <div className="flex gap-2 items-center">
-                          <span
-                            className={`h-4 w-4 rounded-sm`}
-                            style={{ backgroundColor: `${option.value}` }}
-                          ></span>
-                          {option.label}
-                        </div>
+                        {option.label}
                       </SelectItem>
                     );
                   })}
@@ -151,15 +120,9 @@ const FormSelectColor = ({
         </SelectTrigger>
         <SelectContent>
           {showAll && <SelectItem value="all">TODOS</SelectItem>}
-          {colorOptions?.map((item: Toption) => (
+          {roleOptions?.map((item: Toption) => (
             <SelectItem className="text-left" key={item.value} value={item.value}>
-              <div className="flex gap-2 items-center">
-                <span
-                  className={`h-4 w-4 rounded-sm`}
-                  style={{ backgroundColor: `${item.value}` }}
-                ></span>
-                {item.label}
-              </div>
+              {item.label}
             </SelectItem>
           ))}
         </SelectContent>
@@ -168,4 +131,4 @@ const FormSelectColor = ({
   );
 };
 
-export default FormSelectColor;
+export default FormSelectRole;

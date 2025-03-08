@@ -8,51 +8,63 @@ import {
 } from "@/components/ui/dialog";
 
 import { InputWithLabel } from "@/components/custom/FormInput";
-import FormSelectColor from "@/components/custom/FormSelectColor";
+import FormSelectRole from "@/components/custom/FormSelectRole";
 import { Button } from "@/components/ui/button";
-import { useGroups } from "@/hooks/settings/useGroups";
+import { normalizeNumberOnly, normalizePhoneNumber } from "@/helpers/mask";
 import { toast } from "@/hooks/use-toast";
-import { GroupProps } from "@/types/GroupProps";
+import { useUsers } from "@/hooks/useUsers";
+import { UserProps } from "@/types/UserProps";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { Ban, Pen, Save } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FaSpinner } from "react-icons/fa6";
-import { useStoreGroups } from "./store";
+import { useStoreUsers } from "./store";
 
-const initialProps: GroupProps = {
+const initialProps: UserProps = {
   _id: "",
   name: "",
-  color: "",
+  email: "",
+  phone_number: "",
+  password: "senha123",
+  role: "user",
 };
 
-const ModalGroup = () => {
-  const modalOpen = useStoreGroups((state) => state.modalOpen);
-  const closeModal = useStoreGroups((state) => state.closeModal);
-  const modalEditing = useStoreGroups((state) => state.modalEditing);
-  const editModal = useStoreGroups((state) => state.editModal);
-  const id = useStoreGroups((state) => state.id);
+const ModalUser = () => {
+  const modalOpen = useStoreUsers((state) => state.modalOpen);
+  const closeModal = useStoreUsers((state) => state.closeModal);
+  const modalEditing = useStoreUsers((state) => state.modalEditing);
+  const editModal = useStoreUsers((state) => state.editModal);
+  const id = useStoreUsers((state) => state.id);
 
   const [formData, setFormData] = useState(initialProps);
 
-  const { data } = useGroups().getOne(id);
+  const { data } = useUsers().getOne(id);
   const {
     mutate: insertOne,
     isPending: insertOneIsPending,
     isSuccess: insertOneIsSuccess,
-  } = useGroups().insertOne();
+  } = useUsers().insertOne();
   const {
     mutate: update,
     isPending: updateIsPending,
     isSuccess: updateIsSuccess,
-  } = useGroups().update();
+  } = useUsers().update();
 
   function handleSubmit() {
     if (!formData.name) {
       toast({ title: "Erro!", description: "Nome não informado", variant: "destructive" });
       return;
     }
-    if (!formData.color) {
-      toast({ title: "Erro!", description: "Cor não informada", variant: "destructive" });
+    if (!formData.email) {
+      toast({ title: "Erro!", description: "Email não informado", variant: "destructive" });
+      return;
+    }
+    if (!formData.phone_number) {
+      toast({
+        title: "Erro!",
+        description: "Número de telefone não informado",
+        variant: "destructive",
+      });
       return;
     }
     if (id) update({ data: formData, id: id || "" });
@@ -86,10 +98,10 @@ const ModalGroup = () => {
     <Dialog open={modalOpen} onOpenChange={closeModal}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{id ? `Grupo:` : "Novo Grupo"}</DialogTitle>
+          <DialogTitle>{id ? `Responsável:` : "Novo Responsável"}</DialogTitle>
           <DialogDescription className="hidden"></DialogDescription>
         </DialogHeader>
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2 flex-wrap">
           <InputWithLabel
             label="Nome"
             placeholder="Digite o nome"
@@ -99,12 +111,36 @@ const ModalGroup = () => {
             className="flex-1"
             disabled={!modalEditing || isPending}
           />
-          <FormSelectColor
-            label="Cor"
-            value={formData.color}
-            onChange={(color) => setFormData((prev) => ({ ...prev, color: color || "" }))}
+          <InputWithLabel
+            label="Email"
+            placeholder="Digite o email"
+            value={formData.email}
+            onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
+            required
             className="flex-1"
-            placeholder="Selecione a cor"
+            type="email"
+            disabled={!modalEditing || isPending}
+          />
+          <InputWithLabel
+            label="Telefone"
+            placeholder="Digite o telefone"
+            value={normalizePhoneNumber(formData.phone_number)}
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                phone_number: normalizeNumberOnly(e.target.value),
+              }))
+            }
+            required
+            className="flex-1"
+            disabled={!modalEditing || isPending}
+          />
+          <FormSelectRole
+            label="Permissão"
+            value={formData.role}
+            onChange={(role) => setFormData((prev) => ({ ...prev, role: role || "user" }))}
+            className="w-full flex-1"
+            placeholder="Selecione a permissão"
             disabled={!modalEditing || isPending}
           />
         </div>
@@ -146,4 +182,4 @@ const ModalGroup = () => {
   );
 };
 
-export default ModalGroup;
+export default ModalUser;

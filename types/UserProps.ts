@@ -3,6 +3,6 @@ export interface UserProps {
   name: string;
   email: string;
   phone_number: string;
-  role: "admin" | "user" | "elder";
+  role: "admin" | "user" | "elder" | string;
   password: string;
 }

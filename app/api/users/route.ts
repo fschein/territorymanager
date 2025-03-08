@@ -1,5 +1,6 @@
 import connectToDB from "@/app/api/lib/mongoose";
 import User from "@/app/api/models/user.model";
+import { normalizeNumberOnly } from "@/helpers/mask";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { withAuth } from "../lib/auth";
@@ -18,7 +19,13 @@ export async function POST(req: Request) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ name, email, password: hashedPassword, role, phone_number });
+    const newUser = new User({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+      phone_number: normalizeNumberOnly(phone_number),
+    });
 
     await newUser.save();
     return NextResponse.json({ message: "Usuário criado com sucesso!" }, { status: 201 });

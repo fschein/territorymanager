@@ -90,8 +90,6 @@ const TerritorySideInfo = ({
     }
   }
 
-  console.log(formData);
-
   function handleClose() {
     closeSideInfo();
     if (!id) {

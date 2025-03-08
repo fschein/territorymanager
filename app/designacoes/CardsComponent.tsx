@@ -132,7 +132,7 @@ export const CardsComponent = () => {
                       size={"xs"}
                       variant={"tertiary"}
                       title="Ver o território"
-                      onClick={() => router.push(`/?id=${territory._id}`)}
+                      onClick={() => router.push(`/?number=${territory.number}`)}
                     >
                       <Eye size={16} />
                     </Button>
