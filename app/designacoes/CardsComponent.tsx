@@ -96,11 +96,11 @@ export const CardsComponent = () => {
       <SelectMultiStatus
         maxCount={Infinity}
         value={statusList}
-        onChange={(status: string[]) => setStatusList(status)}
+        onChange={(status) => setStatusList(status)}
       />
       <div className="grid">
         <Table divClassname="border max-h-[50vh] scroll-thin rounded-md">
-          <TableHeader className="sticky top-0 bg-secondary uppercase z-50">
+          <TableHeader className="sticky top-0 bg-secondary uppercase">
             <TableRow>
               <TableHead>Ações</TableHead>
               <TableHead>Status</TableHead>
@@ -141,6 +141,7 @@ export const CardsComponent = () => {
                     </Button>
                     <Button
                       variant={"secondary"}
+                      className="bg-slate-300 dark:text-slate-600"
                       title="Designar"
                       size={"xs"}
                       onClick={sendTerritory}
@@ -179,7 +180,7 @@ export const CardsComponent = () => {
                         className="relative"
                         key={`responsible-${res._id}-${territory._id}`}
                       >
-                        {res.name}
+                        {res.name}{" "}
                         <AlertPopUp
                           title={`Deseja realmente retirar essa designação?`}
                           description="Esse irmão não será mais o resposável por esse terriório."

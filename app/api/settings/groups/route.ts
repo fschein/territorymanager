@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 // 📌 Criar um novo grupo (POST)
 export async function POST(req: Request) {
-  const user = await withAuth(req, ["admin"]);
+  const user = await withAuth(req, ["admin", "elder"]);
   if (user instanceof NextResponse) return user;
   try {
     await connectToDB();

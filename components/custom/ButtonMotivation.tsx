@@ -106,7 +106,7 @@ const ButtonMotivation = ({
           )}
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             disabled={actionDisabled}
             onClick={() => {

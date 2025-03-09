@@ -18,7 +18,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "E-mail já cadastrado." }, { status: 400 });
     }
 
-    const hashedPassword = await bcrypt.hash(password || process.env.DEFAULT_PASSWORD, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
       name,
       email,

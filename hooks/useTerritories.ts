@@ -1,4 +1,3 @@
-import { SquareListProps } from "@/app/main/MapWithDraw";
 import { TerritoryProps } from "@/types/TerritoryProps";
 import api from "@/utils/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -11,13 +10,15 @@ export const useTerritories = () => {
     getAll: (params?: { filters?: unknown }) => {
       return useQuery({
         queryKey: ["territories", "list", [params]],
-        queryFn: async () =>
-          await api.get<TerritoryProps[]>("/territories", { params }).then((res) => res.data),
+        queryFn: async () => {
+          const response = await api.get<TerritoryProps[]>("/territories", { params });
+          return response.data;
+        },
       });
     },
-    getOne: ({ id, enabled }: { id: string; enabled: boolean }) => {
+    getOne: (id: string) => {
       return useQuery({
-        enabled,
+        enabled: !!id,
         queryKey: ["territories", "detail", id],
         queryFn: async () => {
           const response = await api.get<TerritoryProps>(`/territories/${id}`);
@@ -64,6 +65,7 @@ export const useTerritories = () => {
         mutationFn: async (data: {
           id: string;
           status: string;
+          information?: string;
           id_responsible?: string;
           data?: Date;
         }) => {
@@ -76,23 +78,6 @@ export const useTerritories = () => {
         onError: (error: any) => {
           const message = error?.response?.data?.error;
           toast.error("Erro ao atualizar o status do território", {
-            description: message,
-          });
-        },
-      });
-    },
-    doneSquares: () => {
-      return useMutation({
-        mutationFn: async (data: { id: string; square_list?: SquareListProps[]; data?: Date }) => {
-          const response = await api.put<TerritoryProps>(`/territories/squares`, data);
-          return response.data;
-        },
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ["territories"] });
-        },
-        onError: (error: any) => {
-          const message = error?.response?.data?.error;
-          toast.error("Erro ao atualizar as quadras do território", {
             description: message,
           });
         },

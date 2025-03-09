@@ -36,7 +36,7 @@ export async function PUT(req: NextRequest) {
   if (user instanceof NextResponse) return user;
   try {
     await connectToDB();
-    let { id, status, id_responsible, data } = await req.json();
+    let { id, status, information, id_responsible, data } = await req.json();
 
     if (!mongoose.models.Group) {
       await import("@/app/api/models/group.model");
@@ -56,11 +56,7 @@ export async function PUT(req: NextRequest) {
       status = currentTerritory.status; // Mantém o status atual (ongoing)
     }
 
-    const updateFields: any = { status };
-    // Verifique se o status atual é "done" e o novo status é "assigned" para resetar o doneSquaresList
-    if (currentTerritory.status === "done" && status === "assigned") {
-      updateFields.doneSquaresList = [];
-    }
+    const updateFields: any = { status, information };
 
     // Se for "assigned", adiciona o responsável no array (sem duplicação)
     if (id_responsible) {
@@ -88,7 +84,7 @@ export async function PUT(req: NextRequest) {
         user: user.id, // Pegando o ID do usuário autenticado
         data: data || new Date(),
         status,
-        information: "Território finalizado",
+        information,
       });
     }
 

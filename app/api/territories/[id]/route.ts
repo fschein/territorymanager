@@ -40,7 +40,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
 // Atualizar um território (PUT)
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const user = await withAuth(req, ["admin"]);
+  const user = await withAuth(req, ["admin", "elder"]);
   if (user instanceof NextResponse) return user;
   try {
     await connectToDB();
@@ -49,8 +49,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const body = await req.json();
     // Verificando se já existe um território com o mesmo número
     const existingTerritory = await Territory.findOne({ number: body.number });
-    if (existingTerritory && existingTerritory.id !== id) {
-      // Se já existe um território com o mesmo número, mas não é o mesmo que está sendo atualizado
+    if (existingTerritory) {
       throw new Error(`Território com o número ${body.number} já existe`);
     }
     const updatedTerritory = await Territory.findByIdAndUpdate(id, body, {
@@ -71,7 +70,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
 // Deletar um território (DELETE)
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const user = await withAuth(req, ["admin"]);
+  const user = await withAuth(req, ["admin", "elder"]);
   if (user instanceof NextResponse) return user;
   try {
     await connectToDB();

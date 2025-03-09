@@ -21,7 +21,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
 // 📌 Atualizar um bairro (PUT)
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const user = await withAuth(req, ["admin"]);
+  const user = await withAuth(req, ["admin", "elder"]);
   if (user instanceof NextResponse) return user;
   try {
     const id = (await params).id;
@@ -41,8 +41,6 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
 // 📌 Deletar um bairro (DELETE)
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const user = await withAuth(req, ["admin"]);
-  if (user instanceof NextResponse) return user;
   try {
     const id = (await params).id;
     await connectToDB();

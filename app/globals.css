@@ -111,14 +111,3 @@ html, body{
   }
 
 }
-
-.button-slide-in {
-  transform: translateX(100%);
-  opacity: 0;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-.button-slide-in.visible {
-  transform: translateX(0);
-  opacity: 1;
-}
