@@ -144,7 +144,7 @@ const ModalUser = () => {
             disabled={!modalEditing || isPending}
           />
         </div>
-        <DialogFooter>
+        <DialogFooter className="flex gap-2">
           {modalEditing ? (
             <>
               <Button

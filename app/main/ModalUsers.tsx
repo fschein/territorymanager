@@ -33,7 +33,7 @@ export const ModalUsers = ({
   const id = useStoreTerritory().id;
   return (
     <Dialog open={modalOpen} onOpenChange={closeModal}>
-      <DialogContent className="w-full max-w-[90vw] md:max-w-[50vw] rounded-sm">
+      <DialogContent className="w-full md:max-w-[50vw] rounded-sm">
         <DialogTitle className="font-medium text-lg">Responsáveis</DialogTitle>
         <div className="flex gap-0">
           <Button variant={"secondary"} size={"sm"} className="br-0 rounded-none rounded-s-md">

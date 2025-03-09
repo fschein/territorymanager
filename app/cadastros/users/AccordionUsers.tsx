@@ -38,42 +38,44 @@ export const AccordionUsers = () => {
               Adicionar Responsável
             </Button>
           </div>
-          <Table className="bg-background rounded-md">
-            <TableHeader className="uppercase">
-              <TableRow>
-                <TableHead className="w-16">Ação</TableHead>
-                <TableHead>Nome</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Telefone</TableHead>
-                <TableHead>Permissão</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data?.map((user) => (
-                <TableRow className="uppercase" key={user._id}>
-                  <TableCell className="w-16">
-                    <Button
-                      className="border-0 px-2 py-1 text-xs"
-                      size={"xs"}
-                      title="Editar"
-                      variant={"warning"}
-                      onClick={() => openModal(user._id || "")}
-                    >
-                      <Pen size={16} />
-                    </Button>
-                  </TableCell>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell className="normal-case">{user.email}</TableCell>
-                  <TableCell>{normalizePhoneNumber(user.phone_number)}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2 items-center">
-                      {roleOptions.filter((opt) => opt.value == user.role)[0]?.label}
-                    </div>
-                  </TableCell>
+          <div className="grid">
+            <Table className="bg-background rounded-md overflow-auto scroll-thin">
+              <TableHeader className="uppercase">
+                <TableRow>
+                  <TableHead className="w-16">Ação</TableHead>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Telefone</TableHead>
+                  <TableHead>Permissão</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {data?.map((user) => (
+                  <TableRow className="uppercase text-nowrap" key={user._id}>
+                    <TableCell className="w-16">
+                      <Button
+                        className="border-0 px-2 py-1 text-xs"
+                        size={"xs"}
+                        title="Editar"
+                        variant={"warning"}
+                        onClick={() => openModal(user._id || "")}
+                      >
+                        <Pen size={16} />
+                      </Button>
+                    </TableCell>
+                    <TableCell>{user.name}</TableCell>
+                    <TableCell className="normal-case">{user.email}</TableCell>
+                    <TableCell>{normalizePhoneNumber(user.phone_number)}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2 items-center">
+                        {roleOptions.filter((opt) => opt.value == user.role)[0]?.label}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </AccordionContent>
       </AccordionItem>
       <ModalUser />

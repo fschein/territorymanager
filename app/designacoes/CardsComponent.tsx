@@ -2,6 +2,7 @@
 
 import AlertPopUp from "@/components/custom/AlertPopUp";
 import { SelectMultiStatus } from "@/components/custom/SelectStatus";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -22,6 +23,7 @@ import {
   Eye,
   Forward,
   Trash,
+  X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -40,6 +42,7 @@ export const CardsComponent = () => {
   const { data: territories } = useTerritories().getAll({ filters: { statusList } });
   const { data: cardTerritoriesData } = useTerritories().getCountStatus();
   const { mutate: deleteTerritory } = useTerritories().deleteOne();
+  const { mutate: deleteAssigned } = useTerritories().deleteAssigned();
 
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -145,20 +148,22 @@ export const CardsComponent = () => {
                     >
                       <Forward size={20} />
                     </Button>
-                    <AlertPopUp
-                      title={`Deseja realmente remover esse território?`}
-                      description="Esse terrítório será definitivamente removido do servidor."
-                      action={() => deleteTerritory(territory._id || "")}
-                    >
-                      <Button
-                        className="border-0 px-2 py-1 text-xs"
-                        size={"xs"}
-                        variant={"destructive"}
-                        title="Ver o território"
+                    {isAdmin && (
+                      <AlertPopUp
+                        title={`Deseja realmente remover esse território?`}
+                        description="Esse terrítório será definitivamente removido do servidor."
+                        action={() => deleteTerritory(territory._id || "")}
                       >
-                        <Trash size={16} />
-                      </Button>
-                    </AlertPopUp>
+                        <Button
+                          className="border-0 px-2 py-1 text-xs"
+                          size={"xs"}
+                          variant={"destructive"}
+                          title="Ver o território"
+                        >
+                          <Trash size={16} />
+                        </Button>
+                      </AlertPopUp>
+                    )}
                   </TableCell>
                   <TableCell className="text-nowrap text-sm">
                     <span className={`${statusMap.get(territory.status || "")?.style} font-medium`}>
@@ -168,8 +173,30 @@ export const CardsComponent = () => {
                   <TableCell className="text-nowrap text-sm">
                     Território {territory.number}
                   </TableCell>
-                  <TableCell className="text-nowrap text-sm">
-                    {territory?.responsibles?.map((res) => res.name).join(", ") || "-"}
+                  <TableCell className="flex gap-2 text-nowrap text-sm">
+                    {territory?.responsibles?.map((res) => (
+                      <Badge
+                        variant={"outline"}
+                        className="relative"
+                        key={`responsible-${res._id}-${territory._id}`}
+                      >
+                        {res.name}{" "}
+                        <AlertPopUp
+                          title={`Deseja realmente retirar essa designação?`}
+                          description="Esse irmão não será mais o resposável por esse terriório."
+                          action={() =>
+                            deleteAssigned({
+                              id_responsible: res._id,
+                              id_territory: territory._id || "",
+                            })
+                          }
+                        >
+                          <span className="flex justify-center items-center bg-destructive rounded-full w-3.5 h-3.5 absolute -top-1 -right-1 cursor-pointer hover:opacity-85">
+                            <X size={10} className="m-auto" />
+                          </span>
+                        </AlertPopUp>
+                      </Badge>
+                    )) || "-"}
                   </TableCell>
                 </TableRow>
               );

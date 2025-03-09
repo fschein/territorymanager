@@ -106,5 +106,19 @@ export const useTerritories = () => {
         },
       });
     },
+    deleteAssigned: () => {
+      return useMutation({
+        mutationFn: async (data: { id_territory: string; id_responsible: string }) => {
+          await api.put(`/territories/assigned`, data);
+        },
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ["territories"] });
+        },
+        onError: (error: any) => {
+          const message = error?.response?.data?.error;
+          toast.error(message);
+        },
+      });
+    },
   };
 };
