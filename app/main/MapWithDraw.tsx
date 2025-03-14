@@ -126,7 +126,7 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
       loadTerritories();
       setStyleLoaded(true);
     });
-  }, [isClient]);
+  }, [isClient, mapStyle]);
 
   //& FUNÇÕES DOS TERRITÓRIOS E DAS QUADRAS
   const handleTerritoryClick = useCallback(
@@ -136,6 +136,25 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
       openSideInfo({ id, mode: "territory" });
     },
     [openSideInfo]
+  );
+  const lastTapRef = useRef(0);
+
+  const handleTouchEndTerritory = useCallback(
+    (e: any) => {
+      if (e.originalEvent.touches.length > 0 || e.originalEvent.changedTouches.length > 1) {
+        return; // Se houver mais de um toque, não faz nada (ignora zoom)
+      }
+
+      const currentTime = new Date().getTime();
+      const tapLength = currentTime - lastTapRef.current;
+
+      if (tapLength < 300 && tapLength > 0) {
+        handleTerritoryClick(e);
+      }
+
+      lastTapRef.current = currentTime;
+    },
+    [handleTerritoryClick]
   );
 
   const handleSquareClick = useCallback((e: any) => {
@@ -478,22 +497,7 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
         });
 
         map.current.on("dblclick", "poligonos-fill", handleTerritoryClick);
-        let lastTap = 0;
-
-        map.current.on("touchend", "poligonos-fill", (e) => {
-          if (e.originalEvent.touches.length > 0 || e.originalEvent.changedTouches.length > 1) {
-            return; // Se houver mais de um toque, não faz nada (ignora zoom)
-          }
-
-          const currentTime = new Date().getTime();
-          const tapLength = currentTime - lastTap;
-
-          if (tapLength < 300 && tapLength > 0) {
-            handleTerritoryClick(e);
-          }
-
-          lastTap = currentTime;
-        });
+        map.current.on("touchend", "poligonos-fill", handleTouchEndTerritory);
       } else {
         // Remover eventos se a condição for falsa
         map.current.on("mouseenter", "poligonos-fill", () => {
@@ -503,7 +507,7 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
           map.current!.getCanvas().style.cursor = "default";
         });
         map.current.off("dblclick", "poligonos-fill", handleTerritoryClick);
-        map.current.off("touchend", "poligonos-fill", handleTerritoryClick);
+        map.current.off("touchend", "poligonos-fill", handleTouchEndTerritory);
       }
 
       if (canEdit ? showSquares && mode === "square" : showSquares) {
