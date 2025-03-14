@@ -33,12 +33,13 @@ const ButtonDate = ({
   disabled,
   className,
   stopPropagation,
+  style,
 }: ButtonDateProps) => {
   const [date, setDate] = useState<Date>(new Date());
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger type="button" asChild>
+      <AlertDialogTrigger type="button" asChild style={style}>
         <Button
           title={title}
           type="button"

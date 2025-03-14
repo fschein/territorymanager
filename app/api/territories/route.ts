@@ -3,6 +3,7 @@ import connectToDB from "@/app/api/lib/mongoose";
 import Territory from "@/app/api/models/territory.model";
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
+import Square from "../models/square.model";
 
 // Listar todos os territórios (GET)
 export async function GET(req: Request) {
@@ -34,6 +35,7 @@ export async function GET(req: Request) {
 
     // Extraindo número do território (se presente)
     const number = searchParams.get("filters[number]");
+    const showSquares = parseInt(searchParams.get("filters[showSquares]") || "0");
 
     // Construindo o filtro
     const query: any = {};
@@ -45,11 +47,26 @@ export async function GET(req: Request) {
       .populate("id_group")
       .populate("id_neighborhood")
       .populate({ path: "responsibles", strictPopulate: false });
-    const territoriesWithGroupAndNeighborhood = territories.map((territory) => ({
-      ...territory.toObject(),
-      group: territory.id_group,
-      neighborhood: territory.id_neighborhood,
-    }));
+    const territoriesWithGroupAndNeighborhood = await Promise.all(
+      territories.map(async (territory) => {
+        if (showSquares) {
+          const squares = await Square.find({ id_territory: territory._id });
+          return {
+            ...territory.toObject(),
+            group: territory.id_group,
+            neighborhood: territory.id_neighborhood,
+            squares,
+          };
+        } else {
+          return {
+            ...territory.toObject(),
+            group: territory.id_group,
+            neighborhood: territory.id_neighborhood,
+          };
+        }
+      })
+    );
+
     const statusOrder = {
       urgent: 1,
       ongoing: 2,
@@ -76,7 +93,7 @@ export async function GET(req: Request) {
 
 // Criar um novo território (POST)
 export async function POST(req: NextRequest) {
-  const user = await withAuth(req, ["admin", "elder"]);
+  const user = await withAuth(req, ["admin"]);
   if (user instanceof NextResponse) return user;
   try {
     await connectToDB();

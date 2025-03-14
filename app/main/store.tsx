@@ -6,33 +6,53 @@ type CoordinatesProps = [number, number][][];
 
 export interface State {
   id: string;
-  sideInfoOpen: boolean;
+  sideSquareInfoOpen: boolean;
+  sideTerritoryInfoOpen: boolean;
   mapStyle: string;
   coordinates: CoordinatesProps;
   territory: TerritoryProps | null;
+  mode: "territory" | "square";
 }
 
 export interface Actions {
-  openSideInfo: (props: { id: string; coordinates?: CoordinatesProps }) => void;
+  openSideInfo: (props: {
+    id: string;
+    coordinates?: CoordinatesProps;
+    mode?: "territory" | "square";
+  }) => void;
   closeSideInfo: () => void;
   toggleMapStyle: () => void;
   setIdTerritory: (id: string) => void;
   setTerritory: (territory?: TerritoryProps) => void;
+  toggleMode: () => void;
 }
 
 export const useStoreTerritory = create<State & Actions>()(
   persist(
     (set) => ({
       id: "",
-      sideInfoOpen: false,
+      sideSquareInfoOpen: false,
+      sideTerritoryInfoOpen: false,
       mapStyle: "mapbox://styles/mapbox/streets-v11",
       coordinates: [],
       territory: null,
-      openSideInfo: ({ id, coordinates }) => {
-        set({ id, coordinates, sideInfoOpen: true });
+      mode: "territory",
+      openSideInfo: ({ id, coordinates, mode }) => {
+        set((state) => ({
+          id,
+          coordinates,
+          sideSquareInfoOpen: mode ? mode === "square" : state.mode === "square",
+          sideTerritoryInfoOpen: mode ? mode === "territory" : state.mode === "territory",
+        }));
       },
       closeSideInfo: () => {
-        set({ id: "", sideInfoOpen: false, coordinates: [], territory: null });
+        set({
+          id: "",
+          sideSquareInfoOpen: false,
+          sideTerritoryInfoOpen: false,
+          coordinates: [],
+          territory: null,
+        });
       },
       setIdTerritory: (id: string) => set({ id }),
 
@@ -46,6 +66,11 @@ export const useStoreTerritory = create<State & Actions>()(
       },
       setTerritory(territory) {
         set({ territory });
+      },
+      toggleMode: () => {
+        set((state) => ({
+          mode: state.mode === "territory" ? "square" : "territory",
+        }));
       },
     }),
     {

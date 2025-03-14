@@ -40,7 +40,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
 // Atualizar um território (PUT)
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const user = await withAuth(req, ["admin", "elder"]);
+  const user = await withAuth(req, ["admin"]);
   if (user instanceof NextResponse) return user;
   try {
     await connectToDB();
@@ -70,7 +70,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
 // Deletar um território (DELETE)
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const user = await withAuth(req, ["admin", "elder"]);
+  const user = await withAuth(req, ["admin"]);
   if (user instanceof NextResponse) return user;
   try {
     await connectToDB();

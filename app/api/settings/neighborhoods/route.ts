@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 // 📌 Criar um novo bairro (POST)
 export async function POST(req: Request) {
-  const user = await withAuth(req, ["admin", "elder"]);
+  const user = await withAuth(req, ["admin"]);
   if (user instanceof NextResponse) return user;
   try {
     await connectToDB();
