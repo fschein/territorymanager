@@ -1,4 +1,5 @@
 "use client";
+import AlertRemoveSquare from "@/components/custom/AlertRemoveSquare";
 import { ToggleMapMode } from "@/components/custom/ToggleMapMode";
 import { Button } from "@/components/ui/button";
 import { useTerritories } from "@/hooks/useTerritories";
@@ -39,6 +40,7 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
 
   //~ DADOS/FUNÇÕES STORE
   const openSideInfo = useStoreTerritory().openSideInfo;
+  const openAlertRemoveSquare = useStoreTerritory().openAlertRemoveSquare;
 
   const mapStyle = useStoreTerritory().mapStyle;
   const toggleMapStyle = useStoreTerritory().toggleMapStyle;
@@ -136,20 +138,26 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
     [openSideInfo]
   );
 
-  const handleSquareClick = useCallback(
+  const handleSquareClick = useCallback((e: any) => {
+    if (!e.features || e.features.length === 0) return;
+    const id = e.features[0].properties?.id;
+    const label = e.features[0].properties?.number;
+    setSquareList((prev) => {
+      const existingSquare = prev.find((sq) => sq.id === id);
+      if (existingSquare) {
+        return existingSquare.canToggle ? prev.filter((sq) => sq.id !== id) : prev;
+      }
+      return [...prev, { id, canToggle: true, label }];
+    });
+  }, []);
+
+  const handleRemoveSquare = useCallback(
     (e: any) => {
       if (!e.features || e.features.length === 0) return;
       const id = e.features[0].properties?.id;
-      const label = e.features[0].properties?.number;
-      setSquareList((prev) => {
-        const existingSquare = prev.find((sq) => sq.id === id);
-        if (existingSquare) {
-          return existingSquare.canToggle ? prev.filter((sq) => sq.id !== id) : prev;
-        }
-        return [...prev, { id, canToggle: true, label }];
-      });
+      openAlertRemoveSquare(id);
     },
-    [openSideInfo]
+    [openAlertRemoveSquare]
   );
 
   //* --------------- QUADRAS ---------------
@@ -287,6 +295,7 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
 
       map.current.off("click", "squares-fill", handleSquareClick);
       map.current.off("touchend", "squares-fill", handleSquareClick);
+      map.current.off("dblclick", "squares-fill", handleRemoveSquare);
       // Mudar cursor ao passar sobre os polígonos
       map.current.on("mouseenter", "squares-fill", () => {
         map.current!.getCanvas().style.cursor = "pointer";
@@ -297,9 +306,13 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
       });
 
       // Eventos nas quadras
-
-      map.current.on("click", "squares-fill", handleSquareClick);
-      map.current.on("touchend", "squares-fill", handleSquareClick);
+      if (number) {
+        map.current.on("click", "squares-fill", handleSquareClick);
+        map.current.on("touchend", "squares-fill", handleSquareClick);
+      } else if (canEdit) {
+        // Eventos de remoção das quadras
+        map.current.on("dblclick", "squares-fill", handleRemoveSquare);
+      }
     });
   }, [territories, styleLoaded, isClient, isSuccess, isPending, mode]);
 
@@ -603,6 +616,7 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
       </div>
       <TerritorySideInfo removeFeature={deleteSelectedPolygon} editing={canEdit} />
       <SquareSideInfo removeFeature={deleteSelectedPolygon} editing={canEdit} />
+      <AlertRemoveSquare />
     </div>
   );
 }

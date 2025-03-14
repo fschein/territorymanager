@@ -60,7 +60,7 @@ export const useSquares = () => {
         },
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["squares"] });
-          queryClient.invalidateQueries({ queryKey: ["tertitories"] });
+          queryClient.invalidateQueries({ queryKey: ["territories"] });
         },
         onError: (error: any) => {
           const message = error?.response?.data?.error;

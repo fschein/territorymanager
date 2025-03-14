@@ -6,7 +6,9 @@ type CoordinatesProps = [number, number][][];
 
 export interface State {
   id: string;
+  id_square: string;
   sideSquareInfoOpen: boolean;
+  alertRemoveSquareOpen: boolean;
   sideTerritoryInfoOpen: boolean;
   mapStyle: string;
   coordinates: CoordinatesProps;
@@ -21,6 +23,8 @@ export interface Actions {
     mode?: "territory" | "square";
   }) => void;
   closeSideInfo: () => void;
+  openAlertRemoveSquare: (id: string) => void;
+  closeAlertRemoveSquare: () => void;
   toggleMapStyle: () => void;
   setIdTerritory: (id: string) => void;
   setTerritory: (territory?: TerritoryProps) => void;
@@ -31,7 +35,9 @@ export const useStoreTerritory = create<State & Actions>()(
   persist(
     (set) => ({
       id: "",
+      id_square: "",
       sideSquareInfoOpen: false,
+      alertRemoveSquareOpen: false,
       sideTerritoryInfoOpen: false,
       mapStyle: "mapbox://styles/mapbox/streets-v11",
       coordinates: [],
@@ -54,6 +60,8 @@ export const useStoreTerritory = create<State & Actions>()(
           territory: null,
         });
       },
+      openAlertRemoveSquare: (id) => set({ id_square: id, alertRemoveSquareOpen: true }),
+      closeAlertRemoveSquare: () => set({ id_square: "", alertRemoveSquareOpen: false }),
       setIdTerritory: (id: string) => set({ id }),
 
       toggleMapStyle: () => {
