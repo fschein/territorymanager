@@ -100,7 +100,7 @@ export const CardsComponent = () => {
       />
       <div className="grid">
         <Table divClassname="border max-h-[50vh] scroll-thin rounded-md">
-          <TableHeader className="sticky top-0 bg-secondary uppercase">
+          <TableHeader className="sticky top-0 bg-secondary uppercase z-50">
             <TableRow>
               <TableHead>Ações</TableHead>
               <TableHead>Status</TableHead>

@@ -187,15 +187,17 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
 
     territories.forEach((territory, index) => {
       const squares = territory.squares;
-
       if (!squares || !squares.length || !map.current) return;
 
       // Criar fontes para cada território
-      const squaresSourceId = `squares`;
-      const squaresLabelsSourceId = `squares-labels`;
+      const squaresSourceId = `squares-${territory._id}`;
+      const squaresLabelsSourceId = `squares-labels-${territory._id}`;
+      const squaresFillId = `squares-fill-${territory._id}`;
+      const squaresOutlineId = `squares-outline-${territory._id}`;
+      const squaresNumberId = `squares-number-${territory._id}`;
 
       // Removendo layers e sources existentes
-      const layersToRemove = [`squares-fill`, `squares-outline`, `squares-number`];
+      const layersToRemove = [squaresFillId, squaresOutlineId, squaresNumberId];
       layersToRemove.forEach((layer) => {
         if (map.current!.getLayer(layer)) {
           map.current!.removeLayer(layer);
@@ -255,7 +257,7 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
 
       // Adicionar a camada de preenchimento das quadras para o território
       map.current.addLayer({
-        id: `squares-fill`,
+        id: squaresFillId,
         type: "fill",
         source: squaresSourceId,
         paint: {
@@ -272,8 +274,8 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
 
       if (number) {
         const doneSquaresList = territory?.doneSquaresList;
-        if (doneSquaresList && map.current!.getLayer("squares-fill")) {
-          map.current.setPaintProperty("squares-fill", "fill-opacity", [
+        if (doneSquaresList && map.current!.getLayer(squaresFillId)) {
+          map.current.setPaintProperty(squaresFillId, "fill-opacity", [
             "step",
             ["to-number", ["in", ["get", "id"], ["literal", doneSquaresList]]],
             0.2,
@@ -285,7 +287,7 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
 
       // Adicionar a camada das bordas dos squares para o território
       map.current.addLayer({
-        id: `squares-outline`,
+        id: squaresOutlineId,
         type: "line",
         source: squaresSourceId,
         paint: {
@@ -296,7 +298,7 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
 
       // Adicionar a camada de números dos squares
       map.current.addLayer({
-        id: `squares-number`,
+        id: squaresNumberId,
         type: "symbol",
         source: squaresLabelsSourceId,
         layout: {
@@ -312,25 +314,25 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
         },
       });
 
-      map.current.off("click", "squares-fill", handleSquareClick);
-      map.current.off("touchend", "squares-fill", handleSquareClick);
-      map.current.off("dblclick", "squares-fill", handleRemoveSquare);
+      map.current.off("click", squaresFillId, handleSquareClick);
+      map.current.off("touchend", squaresFillId, handleSquareClick);
+      map.current.off("dblclick", squaresFillId, handleRemoveSquare);
       // Mudar cursor ao passar sobre os polígonos
-      map.current.on("mouseenter", "squares-fill", () => {
+      map.current.on("mouseenter", squaresFillId, () => {
         map.current!.getCanvas().style.cursor = "pointer";
       });
 
-      map.current.on("mouseleave", "squares-fill", () => {
+      map.current.on("mouseleave", squaresFillId, () => {
         map.current!.getCanvas().style.cursor = "";
       });
 
       // Eventos nas quadras
       if (number) {
-        map.current.on("click", "squares-fill", handleSquareClick);
-        map.current.on("touchend", "squares-fill", handleSquareClick);
+        map.current.on("click", squaresFillId, handleSquareClick);
+        map.current.on("touchend", squaresFillId, handleSquareClick);
       } else if (canEdit) {
         // Eventos de remoção das quadras
-        map.current.on("dblclick", "squares-fill", handleRemoveSquare);
+        map.current.on("dblclick", squaresFillId, handleRemoveSquare);
       }
     });
   }, [territories, styleLoaded, isClient, isSuccess, isPending, mode]);
@@ -351,12 +353,16 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
 
   useEffect(() => {
     if (map.current && styleLoaded) {
-      if (map.current!.getLayer("squares-fill")) {
-        //@ts-ignore
-        map.current.setPaintProperty("squares-fill", "fill-opacity", opacity);
-      }
+      territories?.forEach((t) => {
+        const squaresFillId = `squares-fill-${t._id}`;
+
+        if (map.current!.getLayer(squaresFillId)) {
+          //@ts-ignore
+          map.current.setPaintProperty(squaresFillId, "fill-opacity", opacity);
+        }
+      });
     }
-  }, [opacity, styleLoaded, mode]);
+  }, [opacity, styleLoaded, mode, territories]);
 
   useEffect(() => {
     if (number && territories && territories[0] && territories[0].doneSquaresList && styleLoaded) {
@@ -376,29 +382,52 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
     setTimeout(() => {
       if (!map.current) return;
 
+      // TERRITORIES
       // Removendo layers e sources existentes
-      const layersToRemove = [
-        "poligonos-fill",
-        "poligonos-outline",
-        "poligonos-number",
-        "squares-fill",
-        "squares-outline",
-        "squares-number",
-      ];
+      const layersToRemove = ["territories-fill", "territories-outline", "territories-number"];
       layersToRemove.forEach((layer) => {
         if (map.current!.getLayer(layer)) {
           map.current!.removeLayer(layer);
         }
       });
 
-      const sourcesToRemove = ["poligonos", "poligonos-labels", "squares", "squares-labels"];
+      const sourcesToRemove = ["territories", "territories-labels", "squares", "squares-labels"];
       sourcesToRemove.forEach((source) => {
         if (map.current!.getSource(source)) {
           map.current!.removeSource(source);
         }
       });
 
-      map.current.addSource("poligonos", {
+      //SQUARES
+      territories.forEach((territory) => {
+        const squaresSourceId = `squares-${territory._id}`;
+        const squaresLabelsSourceId = `squares-labels-${territory._id}`;
+        const squaresFillId = `squares-fill-${territory._id}`;
+        const squaresOutlineId = `squares-outline-${territory._id}`;
+        const squaresNumberId = `squares-number-${territory._id}`;
+        // Removendo layers e sources existentes
+        const layersToRemove = [squaresFillId, squaresOutlineId, squaresNumberId];
+        layersToRemove.forEach((layer) => {
+          if (map.current!.getLayer(layer)) {
+            map.current!.removeLayer(layer);
+          }
+        });
+
+        const sourcesToRemove = [squaresSourceId, squaresLabelsSourceId];
+        sourcesToRemove.forEach((source) => {
+          if (map.current!.getSource(source)) {
+            map.current!.removeSource(source);
+          }
+        });
+      });
+
+      // ACTIONS
+      if (map.current.getLayer("territories-fill")) {
+        map.current.off("dblclick", "territories-fill", handleTerritoryClick);
+        map.current.off("touchend", "territories-fill", handleTouchEndTerritory);
+      }
+
+      map.current.addSource("territories", {
         type: "geojson",
         data: {
           type: "FeatureCollection",
@@ -420,9 +449,9 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
 
       // Adicionar camada dos polígonos
       map.current.addLayer({
-        id: "poligonos-fill",
+        id: "territories-fill",
         type: "fill",
-        source: "poligonos",
+        source: "territories",
         paint: {
           "fill-color": ["get", "color"],
           "fill-opacity": 0.2,
@@ -431,9 +460,9 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
 
       // Adicionar camada das bordas dos polígonos
       map.current.addLayer({
-        id: "poligonos-outline",
+        id: "territories-outline",
         type: "line",
-        source: "poligonos",
+        source: "territories",
         paint: {
           "line-color": ["get", "color"],
           "line-width": 2,
@@ -442,7 +471,7 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
 
       // Criar um novo source para os números (centro dos territórios)
       if (!showSquares || (canEdit && mode === "territory")) {
-        map.current.addSource("poligonos-labels", {
+        map.current.addSource("territories-labels", {
           type: "geojson",
           data: {
             type: "FeatureCollection",
@@ -472,9 +501,9 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
         });
         // Adicionar camada para os números no centro dos territórios
         map.current.addLayer({
-          id: "poligonos-number",
+          id: "territories-number",
           type: "symbol",
-          source: "poligonos-labels",
+          source: "territories-labels",
           layout: {
             "text-field": ["get", "number"], // Exibe o número do number
             "text-size": 18,
@@ -488,26 +517,26 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
           },
         });
         // Mudar cursor ao passar sobre os polígonos
-        map.current.on("mouseenter", "poligonos-fill", () => {
+        map.current.on("mouseenter", "territories-fill", () => {
           map.current!.getCanvas().style.cursor = "pointer";
         });
 
-        map.current.on("mouseleave", "poligonos-fill", () => {
+        map.current.on("mouseleave", "territories-fill", () => {
           map.current!.getCanvas().style.cursor = "";
         });
 
-        map.current.on("dblclick", "poligonos-fill", handleTerritoryClick);
-        map.current.on("touchend", "poligonos-fill", handleTouchEndTerritory);
+        map.current.on("dblclick", "territories-fill", handleTerritoryClick);
+        map.current.on("touchend", "territories-fill", handleTouchEndTerritory);
       } else {
         // Remover eventos se a condição for falsa
-        map.current.on("mouseenter", "poligonos-fill", () => {
+        map.current.on("mouseenter", "territories-fill", () => {
           map.current!.getCanvas().style.cursor = "default";
         });
-        map.current.on("mouseleave", "poligonos-fill", () => {
+        map.current.on("mouseleave", "territories-fill", () => {
           map.current!.getCanvas().style.cursor = "default";
         });
-        map.current.off("dblclick", "poligonos-fill", handleTerritoryClick);
-        map.current.off("touchend", "poligonos-fill", handleTouchEndTerritory);
+        map.current.off("dblclick", "territories-fill", handleTerritoryClick);
+        map.current.off("touchend", "territories-fill", handleTouchEndTerritory);
       }
 
       if (canEdit ? showSquares && mode === "square" : showSquares) {

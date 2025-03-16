@@ -47,25 +47,26 @@ export async function GET(req: Request) {
       .populate("id_group")
       .populate("id_neighborhood")
       .populate({ path: "responsibles", strictPopulate: false });
-    const territoriesWithGroupAndNeighborhood = await Promise.all(
-      territories.map(async (territory) => {
-        if (showSquares) {
-          const squares = await Square.find({ id_territory: territory._id });
-          return {
-            ...territory.toObject(),
-            group: territory.id_group,
-            neighborhood: territory.id_neighborhood,
-            squares,
-          };
-        } else {
-          return {
-            ...territory.toObject(),
-            group: territory.id_group,
-            neighborhood: territory.id_neighborhood,
-          };
+
+    const squaresByTerritory = new Map();
+    if (showSquares) {
+      const squares = await Square.find({ id_territory: { $in: territories.map((t) => t._id) } });
+
+      // Agrupar os squares pelos territórios usando um Map
+      for (const square of squares) {
+        if (!squaresByTerritory.has(String(square.id_territory))) {
+          squaresByTerritory.set(String(square.id_territory), []);
         }
-      })
-    );
+        squaresByTerritory.get(String(square.id_territory)).push(square);
+      }
+    }
+
+    const territoriesWithGroupAndNeighborhood = territories.map((territory) => ({
+      ...territory.toObject(),
+      group: territory.id_group,
+      neighborhood: territory.id_neighborhood,
+      squares: squaresByTerritory.get(String(territory._id)) || [],
+    }));
 
     const statusOrder = {
       urgent: 1,
