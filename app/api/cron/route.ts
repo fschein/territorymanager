@@ -16,19 +16,33 @@ export async function GET(req: Request) {
     const thresholdDays = parseInt(process.env.TERRITORY_LOG_THRESHOLD_DAYS || "60", 10);
     const thresholdDate = subDays(new Date(), thresholdDays);
 
-    const outdatedTerritories = await Territory.find().lean();
+    // Buscar todos os territórios "done" de uma vez
+    const outdatedTerritories = await Territory.find({ status: "done" }).lean();
 
-    const territoriesToUpdate = [];
-    for (const territory of outdatedTerritories) {
-      const lastLog = await TerritoryLog.findOne({ id_territory: territory._id })
-        .sort({ date: -1 })
-        .lean();
+    // Buscar todos os logs de territórios relevantes em uma única query
+    const logs = await TerritoryLog.find({
+      id_territory: { $in: outdatedTerritories.map((t) => t._id) },
+    })
+      .sort({ date: -1 }) // Ordena por data decrescente
+      .lean();
 
-      if (!lastLog || Array.isArray(lastLog) || isBefore(new Date(lastLog.date), thresholdDate)) {
-        territoriesToUpdate.push(territory._id);
+    // Criar um Map para acessar o último log de cada território rapidamente
+    const lastLogsMap = new Map();
+    logs.forEach((log) => {
+      if (!lastLogsMap.has(log.id_territory)) {
+        lastLogsMap.set(log.id_territory, log);
       }
-    }
+    });
 
+    // Filtrar territórios que precisam ser atualizados
+    const territoriesToUpdate = outdatedTerritories
+      .filter((territory) => {
+        const lastLog = lastLogsMap.get(territory._id);
+        return !lastLog || isBefore(new Date(lastLog.date), thresholdDate);
+      })
+      .map((territory) => territory._id);
+
+    // Atualizar apenas os necessários
     if (territoriesToUpdate.length > 0) {
       await Territory.updateMany(
         { _id: { $in: territoriesToUpdate } },
