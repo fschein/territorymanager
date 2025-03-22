@@ -13,8 +13,8 @@ export default function Designacoes() {
   }, []);
   return (
     <MainComponent className="gap-8 max-w-4xl mx-auto">
-      {isAdmin && <CardsComponent />}
       <MyTerritories />
+      {isAdmin && <CardsComponent />}
     </MainComponent>
   );
 }

@@ -11,10 +11,8 @@ export const useTerritories = () => {
     getAll: (params?: { filters?: unknown }) => {
       return useQuery({
         queryKey: ["territories", "list", [params]],
-        queryFn: async () => {
-          const response = await api.get<TerritoryProps[]>("/territories", { params });
-          return response.data;
-        },
+        queryFn: async () =>
+          await api.get<TerritoryProps[]>("/territories", { params }).then((res) => res.data),
       });
     },
     getOne: ({ id, enabled }: { id: string; enabled: boolean }) => {

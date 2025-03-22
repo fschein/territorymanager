@@ -69,9 +69,9 @@ export async function GET(req: Request) {
     }));
 
     const statusOrder = {
-      urgent: 1,
+      assigned: 1,
       ongoing: 2,
-      assigned: 3,
+      urgent: 3,
       done: 4,
     };
 
@@ -82,6 +82,7 @@ export async function GET(req: Request) {
         (statusOrder[b.status as keyof typeof statusOrder] || 99)
       );
     });
+
     return NextResponse.json(territoriesWithGroupAndNeighborhood, { status: 200 });
   } catch (error: any) {
     console.error("Erro ao buscar territórios:", error.message);

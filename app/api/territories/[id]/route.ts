@@ -49,7 +49,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const body = await req.json();
     // Verificando se já existe um território com o mesmo número
     const existingTerritory = await Territory.findOne({ number: body.number });
-    if (existingTerritory) {
+    if (existingTerritory && existingTerritory.id !== id) {
+      // Se já existe um território com o mesmo número, mas não é o mesmo que está sendo atualizado
       throw new Error(`Território com o número ${body.number} já existe`);
     }
     const updatedTerritory = await Territory.findByIdAndUpdate(id, body, {
