@@ -1,5 +1,6 @@
 import { GroupProps } from "./GroupProps";
 import { NeighborhoodProps } from "./NeighborhoodProps";
+import { SquareProps } from "./SquareProps";
 import { UserProps } from "./UserProps";
 
 export interface TerritoryProps {
@@ -8,11 +9,13 @@ export interface TerritoryProps {
   id_group: string;
   group?: GroupProps;
   id_neighborhood: string;
-  information?: string;
   neighborhood?: NeighborhoodProps;
   coordinates: [number, number][][];
   status?: "assigned" | "ongoing" | "done" | "urgent";
   responsibles?: UserProps[];
+  squares?: SquareProps[];
+  doneSquaresList?: string[];
+  qtde_squares?: number;
 }
 
 export const statusMap = new Map([

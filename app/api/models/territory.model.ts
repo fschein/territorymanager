@@ -5,9 +5,10 @@ export interface TerritoryDocument extends Document {
   id_group?: Types.ObjectId;
   id_neighborhood?: Types.ObjectId;
   coordinates: [number, number][][];
-  information?: string;
   status: "assigned" | "ongoing" | "done" | "urgent";
   responsibles: Types.ObjectId[];
+  doneSquaresList: Types.ObjectId[];
+  qtde_squares?: number;
 }
 
 // Definição do schema
@@ -15,7 +16,6 @@ const territorySchema = new Schema<TerritoryDocument>({
   number: { type: String, unique: true, required: true },
   id_group: { type: Schema.Types.ObjectId, ref: "Group" },
   id_neighborhood: { type: Schema.Types.ObjectId, ref: "Neighborhood" },
-  information: { type: String },
   coordinates: {
     type: [[[Number]]],
     required: true,
@@ -27,6 +27,8 @@ const territorySchema = new Schema<TerritoryDocument>({
     required: true,
   },
   responsibles: [{ type: Schema.Types.ObjectId, ref: "User" }],
+  doneSquaresList: [{ type: Schema.Types.ObjectId, ref: "Square" }],
+  qtde_squares: { type: Number, default: 0 },
 });
 
 // Criando o modelo

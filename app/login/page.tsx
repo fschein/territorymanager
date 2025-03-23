@@ -31,7 +31,9 @@ export default function LoginPage() {
       if (user && token) {
         login({ user, token });
       }
-      router.push("/"); // Redireciona após o login
+      setTimeout(() => {
+        router.push("/"); // Redireciona após o login
+      }, 1000);
     } catch (err: any) {
       setError(err.response?.data?.error || "Erro ao fazer login");
     } finally {

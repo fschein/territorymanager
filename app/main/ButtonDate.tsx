@@ -33,12 +33,13 @@ const ButtonDate = ({
   disabled,
   className,
   stopPropagation,
+  style,
 }: ButtonDateProps) => {
   const [date, setDate] = useState<Date>(new Date());
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger type="button" asChild>
+      <AlertDialogTrigger type="button" asChild style={style}>
         <Button
           title={title}
           type="button"
@@ -62,7 +63,7 @@ const ButtonDate = ({
       >
         <AlertDialogHeader>
           <AlertDialogTitle className="whitespace-pre">
-            {headerTitle || "Digite o date para poder prosseguir"}
+            {headerTitle || "Digite a data para poder prosseguir"}
           </AlertDialogTitle>
           <AlertDialogDescription
             className={description ? "mt-1 whitespace-pre text-wrap" : "hidden"}
@@ -72,7 +73,7 @@ const ButtonDate = ({
           <InputDate value={date} onChange={setDate} className="w-full" />
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
           <AlertDialogAction
             onClick={() => {
               action(date);
