@@ -29,15 +29,15 @@ export async function GET(req: Request) {
     // Criar um Map para acessar o último log de cada território rapidamente
     const lastLogsMap = new Map();
     logs.forEach((log) => {
-      if (!lastLogsMap.has(log.id_territory)) {
-        lastLogsMap.set(log.id_territory, log);
+      if (!lastLogsMap.has(String(log.territory))) {
+        lastLogsMap.set(String(log.territory), log);
       }
     });
 
     // Filtrar territórios que precisam ser atualizados
     const territoriesToUpdate = outdatedTerritories
       .filter((territory) => {
-        const lastLog = lastLogsMap.get(territory._id);
+        const lastLog = lastLogsMap.get(String(territory._id));
         return !lastLog || isBefore(new Date(lastLog.date), thresholdDate);
       })
       .map((territory) => territory._id);
