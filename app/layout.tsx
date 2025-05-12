@@ -8,7 +8,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Territory Manager",
   description: "Um gerenciador de territórios",
-  authors: [{ name: "Jonathan Amarante", url: "https://jon-portfolio.vercel.app/" }],
+  authors: [{ name: "Jonathan Amarante", url: "https://jonportfolio.vercel.app/" }],
   openGraph: {
     title: "Territory Manager",
     description: "Gerenciador de territórios de serviço",
