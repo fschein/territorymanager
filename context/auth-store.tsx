@@ -29,7 +29,6 @@ export const useAuthStore = create(
           isAuthenticate: true,
         });
       },
-
       logout: () => {
         set({
           user: null,
