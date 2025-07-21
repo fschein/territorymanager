@@ -28,7 +28,7 @@ export const metadata: Metadata = {
         alt: "Territory Manager - Gerenciador de Territórios",
       },
       {
-        url: "/android-chrome-512x512.png",
+        url: "/pwa/android/android-launchericon-512-512.png",
         width: 512,
         height: 512,
         alt: "Territory Manager Logo",
@@ -59,10 +59,10 @@ export const metadata: Metadata = {
 
   icons: {
     icon: [
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/pwa/ios/16.png", sizes: "16x16", type: "image/png" },
+      { url: "/pwa/ios/32.png", sizes: "32x32", type: "image/png" },
     ],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    apple: [{ url: "/pwa/ios/180.png", sizes: "180x180", type: "image/png" }],
   },
   manifest: "/manifest.json",
 };
@@ -72,9 +72,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-br">
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png" />
-        <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="icon" href="/pwa/ios/16.png" sizes="16x16" type="image/png" />
+        <link rel="icon" href="/pwa/ios/32.png" sizes="32x32" type="image/png" />
+        <link rel="apple-touch-icon" href="/pwa/ios/180.png" />
         <meta name="theme-color" content="#000000" />
       </head>
       <body className="antialiased">
