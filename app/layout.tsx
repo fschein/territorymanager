@@ -7,31 +7,76 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Territory Manager",
-  description: "Um gerenciador de territórios",
+  description: "Um gerenciador de territórios de serviço de campo",
+  keywords: ["território", "testemunhas", "jeová", "pregação", "serviço de campo"],
   authors: [{ name: "Jonathan Amarante", url: "https://jonportfolio.vercel.app/" }],
+
+  // Open Graph (Facebook, WhatsApp, etc)
   openGraph: {
     title: "Territory Manager",
-    description: "Gerenciador de territórios de serviço",
+    description:
+      "Gerenciador de territórios de serviço de campo - Organize e gerencie territórios de pregação",
     url: process.env.NEXT_PUBLIC_URL || "http://localhost:3000",
+    siteName: "Territory Manager",
     type: "website",
     locale: "pt_BR",
     images: [
       {
-        url: "/android-chrome-192x192.png",
-        width: 190,
-        height: 190,
+        url: "/og-image.png", // Criar esta imagem 1200x630px
+        width: 1200,
+        height: 630,
+        alt: "Territory Manager - Gerenciador de Territórios",
+      },
+      {
+        url: "/android-chrome-512x512.png",
+        width: 512,
+        height: 512,
+        alt: "Territory Manager Logo",
       },
     ],
   },
-  icons: {
-    icon: "./favicon.ico",
-    apple: "./apple-touch-icon.png",
+
+  // Twitter Cards
+  twitter: {
+    card: "summary_large_image",
+    title: "Territory Manager",
+    description: "Gerenciador de territórios de serviço de campo",
+    images: ["/og-image.png"],
   },
+
+  // Outros metadados
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-br">
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png" />
+        <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <meta name="theme-color" content="#000000" />
+      </head>
       <body className="antialiased">
         <ThemeProvider defaultTheme="system" storageKey="ui-theme">
           <QueryProvider>

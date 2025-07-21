@@ -21,9 +21,11 @@ import { FaWhatsapp } from "react-icons/fa6";
 import { useStoreTerritory } from "./store";
 
 export const ModalUsers = ({
+  message,
   modalOpen,
   closeModal,
 }: {
+  message: string;
   modalOpen: boolean;
   closeModal: () => void;
 }) => {
@@ -67,7 +69,10 @@ export const ModalUsers = ({
                       description="Esse terrítório será marcado como pendente e esse irmão ficará responsável por ele."
                       action={() => {
                         setStatus({ id, status: "assigned", id_responsible: user._id });
-                        window.open(`https://wa.me/55${user?.phone_number}`, "_blank");
+                        const whatsappUrl = `https://wa.me/55${
+                          user?.phone_number
+                        }?text=${encodeURIComponent(message)}`;
+                        window.open(whatsappUrl, "_blank");
                       }}
                     >
                       <Button size={"sm"} title="Enviar mensagem" disabled={setStatusIsPending}>

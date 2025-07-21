@@ -1,11 +1,13 @@
 "use client";
 import ButtonMotivation from "@/components/custom/ButtonMotivation";
 import { InputWithLabel } from "@/components/custom/FormInput";
+import { InstallButton } from "@/components/custom/InstallButton";
 import MainComponent from "@/components/custom/MainComponent";
 import { useAuthStore } from "@/context/auth-store";
 import { normalizePhoneNumber } from "@/helpers/mask";
 import { useUsers } from "@/hooks/useUsers";
 import { KeyIcon, User } from "lucide-react";
+
 export default function Cadastros() {
   const { mutate: updateUser } = useUsers().update();
   const user = useAuthStore().user;
@@ -35,6 +37,7 @@ export default function Cadastros() {
           <KeyIcon size={16} className="me-2" />
           Atualizar senha
         </ButtonMotivation>
+        <InstallButton />
       </section>
     </MainComponent>
   );

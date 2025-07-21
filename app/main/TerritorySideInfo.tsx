@@ -45,6 +45,7 @@ const TerritorySideInfo = ({
   const setTerritory = useStoreTerritory().setTerritory;
   const coordinates = useStoreTerritory().coordinates;
   const [modalUserOpen, setModalUserOpen] = useState(false);
+  const [message, setMessage] = useState("");
 
   const { data, isLoading } = useTerritories().getOne({
     id,
@@ -109,17 +110,18 @@ const TerritorySideInfo = ({
   async function sendTerritory() {
     const number = data?.number;
     const mensagem =
-      `${url}/?number=${data?.number}\n\n` +
-      `*Olá!* 😁\n` +
-      `Você foi designado para o território *${number}*.\n` +
-      `Acesse o link acima para conferir todos os detalhes.\n` +
-      `Se precisar de algo, estou à disposição!\n\n` +
-      `⚠️ _Ao finalizar o território, lembre-se de marcá-lo como concluído._`;
+      `*Território ${number} - Designação*\n\n` +
+      `Olá, irmão!\n` +
+      `Você foi designado(a) para trabalhar o território *${number}*.\n\n` +
+      `*Link para acessar:*\n${url}/?number=${number}\n\n` +
+      `*Instruções importantes:*\n` +
+      `- Acesse o link para ver o mapa e detalhes\n` +
+      `- Ao concluir o trabalho, marque como "concluído" no sistema\n` +
+      `- Qualquer dúvida, estarei à disposição\n\n` +
+      `Que Jeová abençoe seu serviço!`;
 
-    navigator.clipboard
-      .writeText(mensagem)
-      .then(() => toast.info("Mensagem copiada!"))
-      .catch((err) => toast.error("Erro ao copiar a mensagem:", err));
+    navigator.clipboard.writeText(mensagem);
+    setMessage(mensagem);
     setModalUserOpen(true);
   }
   useEffect(() => {
@@ -221,6 +223,7 @@ const TerritorySideInfo = ({
                     <Forward size={20} />
                   </Button>
                   <ModalUsers
+                    message={message}
                     modalOpen={modalUserOpen}
                     closeModal={() => setModalUserOpen(false)}
                   />

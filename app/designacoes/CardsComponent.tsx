@@ -27,7 +27,6 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { ModalUsers } from "../main/ModalUsers";
 import { useStoreTerritory } from "../main/store";
 
@@ -37,6 +36,7 @@ export const CardsComponent = () => {
   const router = useRouter();
   const [statusList, setStatusList] = useState<string[]>(["urgent", "ongoing", "assigned", "done"]);
   const [modalUserOpen, setModalUserOpen] = useState(false);
+  const [message, setMessage] = useState("");
   const setIdTerritory = useStoreTerritory().setIdTerritory;
 
   const { data: territories } = useTerritories().getAll({ filters: { statusList } });
@@ -114,17 +114,18 @@ export const CardsComponent = () => {
                 setIdTerritory(territory._id || "");
                 const number = territory?.number;
                 const mensagem =
-                  `${url}/?number=${territory.number}\n\n` +
-                  `*Olá!* 😁\n` +
-                  `Você foi designado para o território *${number}*.\n` +
-                  `Acesse o link acima para conferir todos os detalhes.\n` +
-                  `Se precisar de algo, estou à disposição!\n\n` +
-                  `⚠️ _Ao finalizar o território, lembre-se de marcá-lo como concluído._`;
+                  `*Território ${number} - Designação*\n\n` +
+                  `Olá, irmão!\n` +
+                  `Você foi designado(a) para trabalhar o território *${number}*.\n\n` +
+                  `*Link para acessar:*\n${url}/?number=${number}\n\n` +
+                  `*Instruções importantes:*\n` +
+                  `- Acesse o link para ver o mapa e detalhes\n` +
+                  `- Ao concluir o trabalho, marque como "concluído" no sistema\n` +
+                  `- Qualquer dúvida, estarei à disposição\n\n` +
+                  `Que Jeová abençoe seu serviço!`;
 
-                navigator.clipboard
-                  .writeText(mensagem)
-                  .then(() => toast.info("Mensagem copiada!"))
-                  .catch((err) => toast.error("Erro ao copiar a mensagem:", err));
+                navigator.clipboard.writeText(mensagem);
+                setMessage(mensagem);
                 setModalUserOpen(true);
               }
               return (
@@ -203,7 +204,11 @@ export const CardsComponent = () => {
           </TableBody>
         </Table>
       </div>
-      <ModalUsers modalOpen={modalUserOpen} closeModal={() => setModalUserOpen(false)} />
+      <ModalUsers
+        message={message}
+        modalOpen={modalUserOpen}
+        closeModal={() => setModalUserOpen(false)}
+      />
     </section>
   );
 };
