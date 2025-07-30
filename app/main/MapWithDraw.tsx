@@ -597,7 +597,7 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
 
   return (
     <div className="flex justify-center items-center flex-wrap">
-      <div ref={mapContainer} className="rounded-md max-w-6xl h-[80dvh] w-full">
+      <div ref={mapContainer} className="rounded-md max-w-6xl h-[calc(100dvh-11rem)] w-full">
         <Button
           onClick={() => {
             toggleMapStyle();

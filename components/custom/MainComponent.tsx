@@ -39,9 +39,14 @@ export default function MainComponent({
   }, []);
 
   return (
-    <main className="flex flex-col gap-4 w-full bg-background py-8 px-4 max-w-6xl mx-auto">
+    <main className="flex flex-col gap-6 w-full bg-background py-6 px-4 max-w-6xl mx-auto">
       <HeaderMenu />
-      <section className={cn("flex flex-col flex-wrap w-full h-full min-h-[70dvh]", className)}>
+      <section
+        className={cn(
+          "flex flex-col flex-wrap w-full h-full min-h-[calc(100dvh-11rem)]",
+          className
+        )}
+      >
         {children}
       </section>
       <Footer />

@@ -25,7 +25,7 @@ export function HeaderMenu() {
   };
 
   return (
-    <ScrollArea className="pb-3 sm:p-0">
+    <ScrollArea>
       <Menubar className="max-w-fit mx-auto">
         <MenubarMenu>
           <MenubarTrigger
