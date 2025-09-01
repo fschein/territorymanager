@@ -3,7 +3,7 @@ import MainComponent from "@/components/custom/MainComponent";
 import { UserProps } from "@/types/UserProps";
 import api from "@/utils/api";
 import { useQueryClient } from "@tanstack/react-query";
-import MapWithoutDraw from "./main/MapWithDraw";
+import MapWithDraw from "./main/MapWithDraw";
 export default function Home() {
   const queryClient = useQueryClient();
   queryClient.prefetchQuery({
@@ -18,7 +18,7 @@ export default function Home() {
   });
   return (
     <MainComponent>
-      <MapWithoutDraw canEdit={true} />
+      <MapWithDraw canEdit={true} />
     </MainComponent>
   );
 }
