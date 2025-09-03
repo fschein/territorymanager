@@ -1,6 +1,5 @@
 "use client";
 
-import { useStoreTerritory } from "@/app/main/store";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,6 +11,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useSquares } from "@/hooks/useSquares";
+import { useStoreTerritory } from "@/stores/store";
 
 const AlertRemoveSquare = () => {
   const id_square = useStoreTerritory().id_square;

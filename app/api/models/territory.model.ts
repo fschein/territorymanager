@@ -2,6 +2,7 @@ import mongoose, { Document, Schema, Types } from "mongoose";
 
 export interface TerritoryDocument extends Document {
   number: string;
+  information?: string;
   id_group?: Types.ObjectId;
   id_neighborhood?: Types.ObjectId;
   coordinates: [number, number][][];
@@ -20,6 +21,7 @@ const territorySchema = new Schema<TerritoryDocument>({
     type: [[[Number]]],
     required: true,
   },
+  information: { type: String, required: false },
   status: {
     type: String,
     enum: ["assigned", "ongoing", "done", "urgent"],

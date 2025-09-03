@@ -6,6 +6,7 @@ import { UserProps } from "./UserProps";
 export interface TerritoryProps {
   _id?: string;
   number: string;
+  information?: string;
   id_group: string;
   group?: GroupProps;
   id_neighborhood: string;

@@ -11,10 +11,10 @@ import mapboxgl, { Map } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import ButtonDate from "./ButtonDate";
+import { useStoreTerritory } from "../../stores/store";
+import ButtonDoneSquare from "./ButtonDoneSquare";
 import SquareSideInfo from "./SquareSideInfo";
 import TerritorySideInfo from "./TerritorySideInfo";
-import { useStoreTerritory } from "./store";
 
 export type SquareListProps = {
   id: string;
@@ -25,7 +25,7 @@ export type SquareListProps = {
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_APP_TOKEN;
 mapboxgl.accessToken = TOKEN;
 
-function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
+function MapWithDraw({ canEdit }: { canEdit: boolean }) {
   const searchParams = useSearchParams();
   const number = searchParams.get("number");
 
@@ -141,8 +141,13 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
 
   const handleTouchEndTerritory = useCallback(
     (e: any) => {
-      if (e.originalEvent.touches.length > 0 || e.originalEvent.changedTouches.length > 1) {
-        return; // Se houver mais de um toque, não faz nada (ignora zoom)
+      // Verificação mais robusta para multi-touch
+      if (
+        (e.originalEvent.touches && e.originalEvent.touches.length > 0) ||
+        (e.originalEvent.changedTouches && e.originalEvent.changedTouches.length > 1)
+      ) {
+        console.log("Multi-touch detectado, ignorando");
+        return; // Ignora multi-touches (pinch zoom, pan com vários dedos, etc)
       }
 
       const currentTime = new Date().getTime();
@@ -156,6 +161,19 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
     },
     [handleTerritoryClick]
   );
+
+  // Função para limpar os event listeners de território
+  const cleanupTerritoryListeners = useCallback(() => {
+    if (map.current) {
+      console.log("Limpando event listeners de território");
+
+      // Remover todos os event listeners associados ao território
+      if (map.current.getLayer("territories-fill")) {
+        map.current.off("dblclick", "territories-fill", handleTerritoryClick);
+        map.current.off("touchend", "territories-fill", handleTouchEndTerritory);
+      }
+    }
+  }, [handleTerritoryClick, handleTouchEndTerritory]);
 
   const handleSquareClick = useCallback((e: any) => {
     if (!e.features || e.features.length === 0) return;
@@ -280,7 +298,7 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
             ["to-number", ["in", ["get", "id"], ["literal", doneSquaresList]]],
             0.2,
             1,
-            0.6,
+            0.8,
           ]);
         }
       }
@@ -347,7 +365,7 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
       ],
       0.2,
       1,
-      0.6,
+      0.8,
     ];
   }, [squareList, canEdit]);
 
@@ -381,6 +399,9 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
 
     setTimeout(() => {
       if (!map.current) return;
+
+      // Primeiro, limpe os event listeners existentes
+      cleanupTerritoryListeners();
 
       // TERRITORIES
       // Removendo layers e sources existentes
@@ -517,26 +538,41 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
           },
         });
         // Mudar cursor ao passar sobre os polígonos
-        map.current.on("mouseenter", "territories-fill", () => {
-          map.current!.getCanvas().style.cursor = "pointer";
-        });
-
-        map.current.on("mouseleave", "territories-fill", () => {
-          map.current!.getCanvas().style.cursor = "";
-        });
-
-        map.current.on("dblclick", "territories-fill", handleTerritoryClick);
-        map.current.on("touchend", "territories-fill", handleTouchEndTerritory);
-      } else {
-        // Remover eventos se a condição for falsa
-        map.current.on("mouseenter", "territories-fill", () => {
-          map.current!.getCanvas().style.cursor = "default";
-        });
-        map.current.on("mouseleave", "territories-fill", () => {
-          map.current!.getCanvas().style.cursor = "default";
-        });
+        // Primeiro removemos todos os listeners existentes
         map.current.off("dblclick", "territories-fill", handleTerritoryClick);
         map.current.off("touchend", "territories-fill", handleTouchEndTerritory);
+
+        // Verificação do modo para determinar se deve adicionar event listeners
+        if (mode === "territory") {
+          console.log("Adicionando listeners de território");
+
+          map.current.on("mouseenter", "territories-fill", () => {
+            map.current!.getCanvas().style.cursor = "pointer";
+          });
+
+          map.current.on("mouseleave", "territories-fill", () => {
+            map.current!.getCanvas().style.cursor = "";
+          });
+
+          map.current.on("dblclick", "territories-fill", handleTerritoryClick);
+          map.current.on("touchend", "territories-fill", handleTouchEndTerritory);
+        } else {
+          // Se não estiver no modo território, configurar cursor padrão
+          map.current.on("mouseenter", "territories-fill", () => {
+            map.current!.getCanvas().style.cursor = "default";
+          });
+          map.current.on("mouseleave", "territories-fill", () => {
+            map.current!.getCanvas().style.cursor = "default";
+          });
+        }
+      } else {
+        // Se não mostrar territórios ou estiver no modo quadrado, cursor padrão
+        map.current.on("mouseenter", "territories-fill", () => {
+          map.current!.getCanvas().style.cursor = "default";
+        });
+        map.current.on("mouseleave", "territories-fill", () => {
+          map.current!.getCanvas().style.cursor = "default";
+        });
       }
 
       if (canEdit ? showSquares && mode === "square" : showSquares) {
@@ -571,6 +607,11 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
     if (territories && territories.length > 0 && territories[0] && isSuccess) {
       loadTerritories();
     }
+
+    // Limpar event listeners quando o componente é desmontado ou o modo muda
+    return () => {
+      cleanupTerritoryListeners();
+    };
   }, [
     territories,
     territories && territories[0],
@@ -579,6 +620,7 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
     isSuccess,
     isPending,
     mode,
+    cleanupTerritoryListeners,
   ]);
 
   //* -------------------------------------------
@@ -611,7 +653,7 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
         </Button>
         {number && (
           <>
-            <ButtonDate
+            <ButtonDoneSquare
               size={"lg"}
               variant={"success"}
               className={`aspect-square rounded-full button-slide-in ${
@@ -621,16 +663,17 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
               title="Concluido"
               headerTitle="Dia que as quadras foram concluídas"
               description="As quadras selecionadas serão marcadas como concluídas"
-              action={(data) =>
+              action={({ date, information }) =>
                 doneSquares({
                   id: (territories && territories[0]._id) || "",
                   square_list: squareList,
-                  data,
+                  data: date,
+                  information,
                 })
               }
             >
               <CircleCheck size={25} />
-            </ButtonDate>
+            </ButtonDoneSquare>
 
             <Button
               onClick={() => {
@@ -656,7 +699,7 @@ function MapWithoutDraw({ canEdit }: { canEdit: boolean }) {
 const Page = ({ canEdit }: { canEdit: boolean }) => {
   return (
     <Suspense fallback={<div>Carregando...</div>}>
-      <MapWithoutDraw canEdit={canEdit} />
+      <MapWithDraw canEdit={canEdit} />
     </Suspense>
   );
 };

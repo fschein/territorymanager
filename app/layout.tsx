@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: "Territory Manager",
     description:
       "Gerenciador de territórios de serviço de campo - Organize e gerencie territórios de pregação",
-    url: process.env.NEXT_PUBLIC_URL || "http://localhost:3000",
+    url: process.env.NEXT_PUBLIC_URL || "http://localhost:5173",
     siteName: "Territory Manager",
     type: "website",
     locale: "pt_BR",

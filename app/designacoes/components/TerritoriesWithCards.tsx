@@ -1,7 +1,6 @@
 "use client";
 
 import AlertPopUp from "@/components/custom/AlertPopUp";
-import { SelectMultiStatus } from "@/components/custom/SelectStatus";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,15 +25,16 @@ import {
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { ModalUsers } from "../main/ModalUsers";
-import { useStoreTerritory } from "../main/store";
+import { useCallback, useEffect, useState } from "react";
+import { useStoreTerritory } from "../../../stores/store";
+import { ModalUsers } from "../../main/ModalUsers";
+import { CardComponent } from "./CardComponent";
 
 const url = process.env.NEXT_PUBLIC_URL;
 
-export const CardsComponent = () => {
+export const TerritoriesWithCards = () => {
   const router = useRouter();
-  const [statusList, setStatusList] = useState<string[]>(["urgent", "ongoing", "assigned", "done"]);
+  const [statusList, setStatusList] = useState<string[]>([]);
   const [modalUserOpen, setModalUserOpen] = useState(false);
   const [message, setMessage] = useState("");
   const setIdTerritory = useStoreTerritory().setIdTerritory;
@@ -46,6 +46,22 @@ export const CardsComponent = () => {
 
   const [isAdmin, setIsAdmin] = useState(false);
 
+  const selectStatus = useCallback(
+    (status: string) => {
+      setStatusList((prev) => {
+        // Verifica se o status já existe na lista
+        if (prev.includes(status)) {
+          // Se existir, remove ele da lista (filtra a lista mantendo apenas os diferentes)
+          return prev.filter((item) => item !== status);
+        } else {
+          // Se não existir, adiciona à lista
+          return [...prev, status];
+        }
+      });
+    },
+    [setStatusList]
+  );
+
   useEffect(() => {
     setIsAdmin(hasRole(["admin"])); // Garante que só roda no cliente
   }, []);
@@ -54,50 +70,48 @@ export const CardsComponent = () => {
     <section className="flex gap-4 flex-col">
       <h2 className="font-medium text-center text-3xl sm:text-left sm:text-2xl ">Territórios</h2>
       <div className="flex flex-wrap gap-3">
-        <div className=" flex-1 min-w-fit flex justify-between items-center gap-3 md:gap-10 rounded-md px-4 py-2 ring-slate-500 ring-2">
-          <div className="flex gap-1 flex-col">
-            <strong className="font-medium text text-slate-500 dark:text-slate-400">
-              Designados
-            </strong>
-            <span className="text-3xl font-semibold text-slate-500">
-              {cardTerritoriesData?.assigned || "0"}
-            </span>
-          </div>
-          <CircleDashed size={40} className="text-slate-500 stroke-[1.5px]" />
-        </div>
-        <div className=" flex-1 min-w-fit flex justify-between items-center gap-3 md:gap-10 rounded-md px-4 py-2 ring-warning ring-2">
-          <div className="flex gap-1 flex-col">
-            <strong className="font-medium text text-warning">Parciais</strong>
-            <span className="text-3xl font-semibold text-warning">
-              {cardTerritoriesData?.ongoing || "0"}
-            </span>
-          </div>
-          <CircleDotDashed size={40} className="text-warning stroke-[1.5px]" />
-        </div>
-        <div className=" flex-1 min-w-fit flex justify-between items-center gap-3 md:gap-10 rounded-md px-4 py-2 ring-success ring-2">
-          <div className="flex gap-1 flex-col">
-            <strong className="font-medium text text-success">Feitos</strong>
-            <span className="text-3xl font-semibold text-success">
-              {cardTerritoriesData?.done || "0"}
-            </span>
-          </div>
-          <CircleCheck size={40} className="text-success stroke-[1.5px]" />
-        </div>
-        <div className=" flex-1 min-w-fit flex justify-between items-center gap-3 md:gap-10 rounded-md px-4 py-2 ring-destructive ring-2">
-          <div className="flex gap-1 flex-col">
-            <strong className="font-medium text text-destructive">Urgentes</strong>
-            <span className="text-3xl font-semibold text-destructive">
-              {cardTerritoriesData?.urgent || "0"}
-            </span>
-          </div>
-          <CircleAlert size={40} className="text-destructive stroke-[1.5px]" />
-        </div>
+        <CardComponent
+          title="Designados"
+          qtde={cardTerritoriesData?.assigned || "0"}
+          value="assigned"
+          selectStatus={selectStatus}
+          icon={CircleDashed}
+          variant="secondary"
+          checked={statusList.includes("assigned")}
+        />
+        <CardComponent
+          title="Parciais"
+          qtde={cardTerritoriesData?.ongoing || "0"}
+          value="ongoing"
+          selectStatus={selectStatus}
+          icon={CircleDotDashed}
+          variant="warning"
+          checked={statusList.includes("ongoing")}
+        />
+        <CardComponent
+          title="Feitos"
+          qtde={cardTerritoriesData?.done || "0"}
+          value="done"
+          selectStatus={selectStatus}
+          icon={CircleCheck}
+          variant="success"
+          checked={statusList.includes("done")}
+        />
+        <CardComponent
+          title="Urgentes"
+          qtde={cardTerritoriesData?.urgent || "0"}
+          value="urgent"
+          selectStatus={selectStatus}
+          icon={CircleAlert}
+          variant="destructive"
+          checked={statusList.includes("urgent")}
+        />
       </div>
-      <SelectMultiStatus
+      {/* <SelectMultiStatus
         maxCount={Infinity}
         value={statusList}
         onChange={(status: string[]) => setStatusList(status)}
-      />
+      /> */}
       <div className="grid">
         <Table divClassname="border max-h-[50vh] scroll-thin rounded-md">
           <TableHeader className="sticky top-0 bg-secondary uppercase z-50">
@@ -192,7 +206,7 @@ export const CardsComponent = () => {
                           }
                         >
                           <span className="flex justify-center items-center bg-destructive rounded-full w-3.5 h-3.5 absolute -top-1 -right-1 cursor-pointer hover:opacity-85">
-                            <X size={10} className="m-auto" />
+                            <X size={10} className="m-auto text-destructive-foreground" />
                           </span>
                         </AlertPopUp>
                       </Badge>

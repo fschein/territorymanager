@@ -10,11 +10,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { Button, ButtonProps } from "../../components/ui/button";
 
-type ButtonDateProps = ButtonProps & {
-  action: (date: Date) => void;
+type ButtonDoneSquareProps = ButtonProps & {
+  action: (params: { date: Date; information?: string }) => void;
   headerTitle?: string;
   placeholder?: string;
   description?: string;
@@ -22,7 +24,7 @@ type ButtonDateProps = ButtonProps & {
   stopPropagation?: boolean;
 };
 
-const ButtonDate = ({
+const ButtonDoneSquare = ({
   children,
   action,
   variant,
@@ -34,8 +36,9 @@ const ButtonDate = ({
   className,
   stopPropagation,
   style,
-}: ButtonDateProps) => {
+}: ButtonDoneSquareProps) => {
   const [date, setDate] = useState<Date>(new Date());
+  const [information, setInformation] = useState<string>("");
 
   return (
     <AlertDialog>
@@ -70,13 +73,20 @@ const ButtonDate = ({
           >
             {description}
           </AlertDialogDescription>
-          <InputDate value={date} onChange={setDate} className="w-full" />
+          <div className="flex flex-col space-y-2 pt-2">
+            <Label className="text-left">Data de Conclusão</Label>
+            <InputDate value={date} onChange={setDate} className="w-full" />
+          </div>
+          <div className="flex flex-col space-y-2 pt-2">
+            <Label className="text-left">Detalhes (opcional)</Label>
+            <Textarea value={information} onChange={(e) => setInformation(e.target.value)} />
+          </div>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
           <AlertDialogAction
             onClick={() => {
-              action(date);
+              action({ date, information });
             }}
           >
             Continue
@@ -87,4 +97,4 @@ const ButtonDate = ({
   );
 };
 
-export default ButtonDate;
+export default ButtonDoneSquare;

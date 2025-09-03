@@ -18,7 +18,7 @@ import { SquareProps } from "@/types/SquareProps";
 import { Ban, Save, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useStoreTerritory } from "./store";
+import { useStoreTerritory } from "../../stores/store";
 
 const initialFormValues: SquareProps = {
   letter: "",

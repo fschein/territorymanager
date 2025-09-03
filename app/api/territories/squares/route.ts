@@ -1,6 +1,7 @@
 import { withAuth } from "@/app/api/lib/auth";
 import connectToDB from "@/app/api/lib/mongoose";
 import Territory from "@/app/api/models/territory.model";
+import { formatDate } from "date-fns";
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 import TerritoryLog from "../../models/territoryLog.model";
@@ -17,7 +18,7 @@ export async function PUT(req: NextRequest) {
     session = await mongoose.startSession();
     session.startTransaction();
 
-    let { id, square_list, data } = await req.json();
+    let { id, square_list, data, information } = await req.json();
 
     // Primeiro, busque o território atual para verificar o status antes da atualização
     const currentTerritory = await Territory.findById(id).session(session);
@@ -27,30 +28,46 @@ export async function PUT(req: NextRequest) {
 
     // Atualiza a lista de doneSquaresList com os ids das quadras
     const doneSquaresIds = square_list.filter((sq: any) => sq.canToggle).map((sq: any) => sq.id);
-    const updatedFields: any = {
-      $addToSet: { doneSquaresList: { $each: doneSquaresIds } },
-    };
 
-    updatedFields.status = "ongoing";
+    // Em vez de $addToSet, definimos diretamente o array atualizado
+    // para garantir que temos a lista exata de quadras concluídas
+    const allDoneSquares = [
+      ...new Set([
+        ...currentTerritory.doneSquaresList.map((id: any) => id.toString()),
+        ...doneSquaresIds,
+      ]),
+    ];
 
-    // Atualizar o território com o novo status e a lista de doneSquaresList
-    const updatedTerritory = await Territory.findByIdAndUpdate(id, updatedFields, {
-      new: true,
-      runValidators: true,
-      session, // Passa a sessão para garantir que a operação faça parte da transação
-    });
-
-    if (!updatedTerritory) throw new Error("Território não encontrado");
+    // Modificar diretamente o documento em vez de usar findByIdAndUpdate
+    currentTerritory.doneSquaresList = allDoneSquares;
+    currentTerritory.status = "ongoing";
 
     // Verifique se a quantidade de doneSquaresList é igual a qtde_squares
-    if (updatedTerritory.doneSquaresList.length === updatedTerritory.qtde_squares) {
-      updatedTerritory.status = "done"; // Marca o território como "done"
-      updatedTerritory.responsibles = [];
+    const isComplete = allDoneSquares.length === currentTerritory.qtde_squares;
+
+    // Gerenciar o campo information
+    // Adicionar a nova informação, se houver
+    if (information) {
+      currentTerritory.information = `${currentTerritory.information || ""}\n[${formatDate(
+        data,
+        "dd/MM/yyyy"
+      )}] ---\n${information}`;
     }
 
-    await updatedTerritory.save({ session }); // Salva as alterações com a sessão
+    // Se o território estiver completo, atualize o status
+    if (isComplete) {
+      currentTerritory.status = "done";
+      currentTerritory.responsibles = [];
+      // Não limpe information se houver nova informação
+      if (!information) {
+        currentTerritory.information = "";
+      }
+    }
 
-    const status = updatedTerritory.status;
+    // Salvar as alterações diretamente no documento
+    await currentTerritory.save({ session });
+
+    const status = currentTerritory.status;
 
     // Gerar a informação para o log (caso o status seja "done" ou "ongoing")
     if (status === "done" || status === "ongoing") {
@@ -78,7 +95,7 @@ export async function PUT(req: NextRequest) {
     // Commit da transação se tudo for bem-sucedido
     await session.commitTransaction();
 
-    return NextResponse.json(updatedTerritory, { status: 200 });
+    return NextResponse.json(currentTerritory, { status: 200 });
   } catch (error: any) {
     // Se algo falhar, o rollback é acionado
     console.error("Erro ao atualizar status do território:", error.message);
@@ -86,7 +103,7 @@ export async function PUT(req: NextRequest) {
     // Aborta a transação em caso de erro
     if (session) await session.abortTransaction();
 
-    return NextResponse.json({ error: error.message, details: error }, { status: 400 });
+    return NextResponse.json({ error: error.message, information: error }, { status: 400 });
   } finally {
     // Finaliza a sessão
     if (session) session.endSession();

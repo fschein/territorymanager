@@ -18,7 +18,7 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import { Search } from "lucide-react";
 import { useState } from "react";
 import { FaWhatsapp } from "react-icons/fa6";
-import { useStoreTerritory } from "./store";
+import { useStoreTerritory } from "../../stores/store";
 
 export const ModalUsers = ({
   message,

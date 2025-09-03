@@ -18,30 +18,30 @@ html, body{
 
 @layer base {
   :root {
-    --background: 210, 36%, 98%;
+    --background: 210 36% 98%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
-    --popover: 0, 0%, 96%;
-    --popover-foreground: 0, 0%, 15%;
-    --primary: 146, 57%, 44%;
+    --popover: 0 0% 96%;
+    --popover-foreground: 0 0% 15%;
+    --primary: 146 57% 44%;
     --primary-foreground: 222.2 84% 94.9%;
     --secondary: 210 40% 87.1%;
-    --secondary-foreground:0, 0%, 40%;
-    --tertiary: 210, 65%, 55%;
-    --tertiary-foreground: 0, 0%, 90%;
-    --success: 146, 68%, 47%;
-    --success-foreground: 0, 0%, 95%;
-    --warning: 35, 90%, 55%;
+    --secondary-foreground:0 0% 40%;
+    --tertiary: 210 65% 55%;
+    --tertiary-foreground: 0 0% 90%;
+    --success: 146 68% 47%;
+    --success-foreground: 0 0% 95%;
+    --warning: 35 90% 55%;
     --warning-foreground: 222.2 84% 99.9%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
     --accent: 210 40% 92.1%;
-    --accent-foreground:0, 0%, 40%;
-    --destructive: 0, 83%, 62%;
+    --accent-foreground:0 0% 40%;
+    --destructive: 0 83% 62%;
     --destructive-foreground: 222.2 84% 94.9%;
-    --border: 220, 14%, 83%;
-    --input: 220, 14%, 73%;
+    --border: 220 14% 83%;
+    --input: 220 14% 73%;
     --ring: 221.2 83.2% 53.3%;
     --scroll: #CBD5E1;
     --radius: 0.5rem;
@@ -54,30 +54,30 @@ html, body{
   }
 
   .dark {
-    --background:220, 20%, 15%;
-    --foreground: 0, 0%, 70%;
+    --background:220 20% 15%;
+    --foreground: 0 0% 70%;
     --card: 222.2 84% 4.9%;
-    --card-foreground: 0, 0%, 70%;
-    --popover: 0, 0%, 12%;
-    --popover-foreground: 0, 0%, 85%;
-    --primary: 146, 68%, 47%;
+    --card-foreground: 0 0% 70%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 85%;
+    --primary: 146 68% 47%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220, 16%, 30%;
-    --secondary-foreground: 0, 0%, 70%;
-    --tertiary: 210, 55%, 35%;
-    --tertiary-foreground: 0, 0%, 70%;
-    --success: 142, 76%, 36%;
+    --secondary: 220 16% 30%;
+    --secondary-foreground: 0 0% 70%;
+    --tertiary: 210 55% 35%;
+    --tertiary-foreground: 0 0% 70%;
+    --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
-    --warning: 38, 80%, 50%;
+    --warning: 38 80% 50%;
     --warning-foreground: 0 0% 100%;
-    --muted: 220, 16%, 30%;
+    --muted: 220 16% 30%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 220, 16%, 30%;
-    --accent-foreground: 0, 0%, 70%;
+    --accent: 220 16% 30%;
+    --accent-foreground: 0 0% 70%;
     --destructive: 0 62.8% 39%;
-    --destructive-foreground: 0, 0%, 70%;
-    --border: 220, 16%, 30%;
-    --input: 220, 16%, 30%;
+    --destructive-foreground: 0 0% 70%;
+    --border: 220 16% 30%;
+    --input: 220 16% 30%;
     --ring: 224.3 76.3% 48%;
     --scroll: #4a5568;
 

@@ -13,15 +13,17 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
 import { hasRole } from "@/helpers/checkAuthorization";
 import { useTerritories } from "@/hooks/useTerritories";
 import { TerritoryProps } from "@/types/TerritoryProps";
+import { Label } from "@radix-ui/react-label";
 import { Ban, CircleCheck, Forward, Save } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import ButtonDate from "./ButtonDate";
+import { useStoreTerritory } from "../../stores/store";
+import ButtonDoneSquare from "./ButtonDoneSquare";
 import { ModalUsers } from "./ModalUsers";
-import { useStoreTerritory } from "./store";
 
 const url = process.env.NEXT_PUBLIC_URL;
 
@@ -192,6 +194,10 @@ const TerritorySideInfo = ({
                 readOnly={!editing || isPending}
                 className="flex-1 w-full"
               />
+              <div className="flex flex-col space-y-2">
+                <Label className="text-left font-medium text-sm">Detalhes</Label>
+                <Textarea readOnly value={formData.information || ""} />
+              </div>
             </section>
           )}
           {editing && (
@@ -231,15 +237,15 @@ const TerritorySideInfo = ({
               )}
             </span>
             <span className="flex gap-2">
-              <ButtonDate
+              <ButtonDoneSquare
                 variant={"success"}
                 title="Concluido"
                 headerTitle="Dia que o território foi concluído"
                 description="Esse território e todas as quadras dele serão marcado como concluídos"
-                action={(data) => setStatus({ id, status: "done", data })}
+                action={({ date }) => setStatus({ id, status: "done", data: date })}
               >
                 <CircleCheck size={20} />
-              </ButtonDate>
+              </ButtonDoneSquare>
             </span>
           </div>
         )}

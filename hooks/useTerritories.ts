@@ -83,7 +83,12 @@ export const useTerritories = () => {
     },
     doneSquares: () => {
       return useMutation({
-        mutationFn: async (data: { id: string; square_list?: SquareListProps[]; data?: Date }) => {
+        mutationFn: async (data: {
+          id: string;
+          square_list?: SquareListProps[];
+          data?: Date;
+          information?: string;
+        }) => {
           const response = await api.put<TerritoryProps>(`/territories/squares`, data);
           return response.data;
         },
