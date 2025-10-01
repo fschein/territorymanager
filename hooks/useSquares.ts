@@ -17,6 +17,16 @@ export const useSquares = () => {
         },
       });
     },
+    getOrphans: ({ enabled = true }: { enabled?: boolean } = {}) => {
+      return useQuery({
+        enabled,
+        queryKey: ["squares", "orphans"],
+        queryFn: async () => {
+          const response = await api.get<SquareProps[]>("/squares");
+          return response.data;
+        },
+      });
+    },
     insertOne: () => {
       return useMutation({
         mutationFn: async (square: Omit<SquareProps, "_id">) => {

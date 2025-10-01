@@ -4,6 +4,34 @@ import Square from "@/app/api/models/square.model";
 import { NextRequest, NextResponse } from "next/server";
 import Territory from "../models/territory.model";
 
+// Buscar squares que não possuem território associado (GET)
+export async function GET(req: NextRequest) {
+  try {
+    await connectToDB();
+
+    // Buscar squares cujo id_territory não tem um território correspondente
+    const orphanSquares = await Square.aggregate([
+      {
+        $lookup: {
+          from: "territories", // Nome da coleção de territórios
+          localField: "id_territory",
+          foreignField: "_id",
+          as: "territory",
+        },
+      },
+      {
+        $match: {
+          territory: { $size: 0 }, // Filtrar squares sem território correspondente
+        },
+      },
+    ]);
+    return NextResponse.json(orphanSquares, { status: 200 });
+  } catch (error: any) {
+    console.error("Erro ao buscar squares órfãos:", error.message);
+    return NextResponse.json({ error: "Erro ao buscar squares órfãos" }, { status: 500 });
+  }
+}
+
 // Criar um novo quadra (POST)
 export async function POST(req: NextRequest) {
   const user = await withAuth(req, ["admin"]);

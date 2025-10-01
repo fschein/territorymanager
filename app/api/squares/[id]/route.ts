@@ -9,13 +9,30 @@ import Territory from "../../models/territory.model";
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await withAuth(req);
   if (user instanceof NextResponse) return user;
+
   try {
     const id = (await params).id;
     await connectToDB();
-    const square = await Square.findById(id);
 
-    if (!square) return NextResponse.json({ error: "Quadra não encontrada" }, { status: 404 });
-    return NextResponse.json(square, { status: 200 });
+    // Buscar a quadra e o território associado em uma única consulta
+    const square = await Square.findById(id).populate("id_territory", "number").lean(); // Usar .lean() para transformar em objeto plano
+
+    if (!square) {
+      return NextResponse.json(
+        { error: "Quadra não encontrada", territory_number: 0 },
+        { status: 404 }
+      );
+    }
+
+    // Retornar a quadra e o número do território (ou 0 se não encontrado)
+    return NextResponse.json(
+      {
+        ...square,
+        //@ts-ignore
+        territory_number: square.id_territory?.number || 0,
+      },
+      { status: 200 }
+    );
   } catch (error: any) {
     console.error("Erro ao buscar quadra:", error.message);
     return NextResponse.json({ error: "Erro ao buscar quadra", details: error }, { status: 500 });
@@ -44,6 +61,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     if (existingSquare) {
       throw new Error(`Quadra com a letra ${body.letter} já existe`);
     }
+
+    // Sobrescrever o id_territory no body com o _id do território encontrado
+    body.id_territory = territory._id;
+
     const updatedSquare = await Square.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
@@ -79,12 +100,11 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
     // Encontrar o território associado à quadra
     const territory = await Territory.findById(deletedSquare.id_territory).session(session);
-    if (!territory)
-      return NextResponse.json({ error: "Território associado não encontrado" }, { status: 404 });
-
-    // Decrementar o qtde_squares no território
-    territory.qtde_squares = Math.max(0, territory.qtde_squares - 1);
-    await territory.save({ session });
+    if (territory) {
+      // Decrementar o qtde_squares no território
+      territory.qtde_squares = Math.max(0, territory.qtde_squares - 1);
+      await territory.save({ session });
+    }
 
     // Commit da transação se todas as operações forem bem-sucedidas
     await session.commitTransaction();

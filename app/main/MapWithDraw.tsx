@@ -2,6 +2,7 @@
 import AlertRemoveSquare from "@/components/custom/AlertRemoveSquare";
 import { ToggleMapMode } from "@/components/custom/ToggleMapMode";
 import { Button } from "@/components/ui/button";
+import { useSquares } from "@/hooks/useSquares";
 import { useTerritories } from "@/hooks/useTerritories";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
@@ -36,6 +37,7 @@ function MapWithDraw({ canEdit }: { canEdit: boolean }) {
     isSuccess,
     isPending,
   } = useTerritories().getAll({ filters: { number, showSquares } });
+  const { data: orphansSquares } = useSquares().getOrphans({ enabled: !!canEdit });
   const { mutate: doneSquares } = useTerritories().doneSquares();
 
   //~ DADOS/FUNÇÕES STORE
@@ -146,7 +148,7 @@ function MapWithDraw({ canEdit }: { canEdit: boolean }) {
         (e.originalEvent.touches && e.originalEvent.touches.length > 0) ||
         (e.originalEvent.changedTouches && e.originalEvent.changedTouches.length > 1)
       ) {
-        console.log("Multi-touch detectado, ignorando");
+        // console.log("Multi-touch detectado, ignorando");
         return; // Ignora multi-touches (pinch zoom, pan com vários dedos, etc)
       }
 
@@ -165,7 +167,7 @@ function MapWithDraw({ canEdit }: { canEdit: boolean }) {
   // Função para limpar os event listeners de território
   const cleanupTerritoryListeners = useCallback(() => {
     if (map.current) {
-      console.log("Limpando event listeners de território");
+      // console.log("Limpando event listeners de território");
 
       // Remover todos os event listeners associados ao território
       if (map.current.getLayer("territories-fill")) {
@@ -175,18 +177,29 @@ function MapWithDraw({ canEdit }: { canEdit: boolean }) {
     }
   }, [handleTerritoryClick, handleTouchEndTerritory]);
 
-  const handleSquareClick = useCallback((e: any) => {
-    if (!e.features || e.features.length === 0) return;
-    const id = e.features[0].properties?.id;
-    const label = e.features[0].properties?.number;
-    setSquareList((prev) => {
-      const existingSquare = prev.find((sq) => sq.id === id);
-      if (existingSquare) {
-        return existingSquare.canToggle ? prev.filter((sq) => sq.id !== id) : prev;
+  const handleSquareClick = useCallback(
+    (e: any) => {
+      if (!e || !e.features || e.features.length === 0 || !e.features[0]?.properties) {
+        return;
       }
-      return [...prev, { id, canToggle: true, label }];
-    });
-  }, []);
+
+      const id = e.features[0].properties?.id;
+
+      if (number) {
+        const label = e.features[0].properties?.number;
+        setSquareList((prev) => {
+          const existingSquare = prev.find((sq) => sq.id === id);
+          if (existingSquare) {
+            return existingSquare.canToggle ? prev.filter((sq) => sq.id !== id) : prev;
+          }
+          return [...prev, { id, canToggle: true, label }];
+        });
+      } else {
+        openSideInfo({ id, mode: "square" });
+      }
+    },
+    [number]
+  );
 
   const handleRemoveSquare = useCallback(
     (e: any) => {
@@ -198,21 +211,28 @@ function MapWithDraw({ canEdit }: { canEdit: boolean }) {
   );
 
   //* --------------- QUADRAS ---------------
-  //& FUNÇÃO DE CARREGAR QUADRAS
-  const loadTerritoriesSquares = useCallback(() => {
-    if (!map.current || !territories?.length || !territories[0] || !styleLoaded || !isClient)
-      return;
-
-    territories.forEach((territory, index) => {
-      const squares = territory.squares;
-      if (!squares || !squares.length || !map.current) return;
+  const createSquares = useCallback(
+    ({
+      squares,
+      color,
+      id,
+      number,
+      doneSquaresList,
+    }: {
+      squares: any[];
+      color: string;
+      id: string;
+      number: string;
+      doneSquaresList: string[];
+    }) => {
+      if (!map.current || !squares.length) return;
 
       // Criar fontes para cada território
-      const squaresSourceId = `squares-${territory._id}`;
-      const squaresLabelsSourceId = `squares-labels-${territory._id}`;
-      const squaresFillId = `squares-fill-${territory._id}`;
-      const squaresOutlineId = `squares-outline-${territory._id}`;
-      const squaresNumberId = `squares-number-${territory._id}`;
+      const squaresSourceId = `squares-${id}`;
+      const squaresLabelsSourceId = `squares-labels-${id}`;
+      const squaresFillId = `squares-fill-${id}`;
+      const squaresOutlineId = `squares-outline-${id}`;
+      const squaresNumberId = `squares-number-${id}`;
 
       // Removendo layers e sources existentes
       const layersToRemove = [squaresFillId, squaresOutlineId, squaresNumberId];
@@ -238,8 +258,8 @@ function MapWithDraw({ canEdit }: { canEdit: boolean }) {
             type: "Feature",
             properties: {
               id: square._id,
-              color: territory?.group?.color,
-              number: `${territory?.number}${square.letter}`,
+              color: color,
+              number: `${number}${square.letter}`,
             },
             geometry: {
               type: "Polygon",
@@ -264,8 +284,8 @@ function MapWithDraw({ canEdit }: { canEdit: boolean }) {
             return {
               type: "Feature",
               properties: {
-                number: `${territory?.number}${square.letter}` || "",
-                color: territory?.group?.color || "",
+                number: `${number}${square.letter}` || "",
+                color: color || "",
               },
               geometry: { type: "Point", coordinates: center },
             };
@@ -290,8 +310,7 @@ function MapWithDraw({ canEdit }: { canEdit: boolean }) {
         },
       });
 
-      if (number) {
-        const doneSquaresList = territory?.doneSquaresList;
+      if (number && !canEdit) {
         if (doneSquaresList && map.current!.getLayer(squaresFillId)) {
           map.current.setPaintProperty(squaresFillId, "fill-opacity", [
             "step",
@@ -352,8 +371,203 @@ function MapWithDraw({ canEdit }: { canEdit: boolean }) {
         // Eventos de remoção das quadras
         map.current.on("dblclick", squaresFillId, handleRemoveSquare);
       }
+    },
+    [
+      map,
+      handleSquareClick,
+      handleRemoveSquare,
+      squareList,
+      canEdit,
+      territories,
+      styleLoaded,
+      isClient,
+      isSuccess,
+      isPending,
+      mode,
+    ]
+  );
+
+  //& FUNÇÃO DE CARREGAR QUADRAS
+  const loadTerritoriesSquares = useCallback(() => {
+    if (!map.current || !territories?.length || !territories[0] || !styleLoaded || !isClient)
+      return;
+
+    territories.forEach((territory) => {
+      const squares = territory.squares;
+      if (!squares || !squares.length || !map.current) return;
+
+      createSquares({
+        squares,
+        color: territory?.group?.color || "",
+        id: territory._id || "",
+        number: territory.number,
+        doneSquaresList: territory.doneSquaresList || [],
+      });
+      // // Criar fontes para cada território
+      // const squaresSourceId = `squares-${territory._id}`;
+      // const squaresLabelsSourceId = `squares-labels-${territory._id}`;
+      // const squaresFillId = `squares-fill-${territory._id}`;
+      // const squaresOutlineId = `squares-outline-${territory._id}`;
+      // const squaresNumberId = `squares-number-${territory._id}`;
+
+      // // Removendo layers e sources existentes
+      // const layersToRemove = [squaresFillId, squaresOutlineId, squaresNumberId];
+      // layersToRemove.forEach((layer) => {
+      //   if (map.current!.getLayer(layer)) {
+      //     map.current!.removeLayer(layer);
+      //   }
+      // });
+
+      // const sourcesToRemove = [squaresSourceId, squaresLabelsSourceId];
+      // sourcesToRemove.forEach((source) => {
+      //   if (map.current!.getSource(source)) {
+      //     map.current!.removeSource(source);
+      //   }
+      // });
+
+      // // Adicionar o source de squares para o território
+      // map.current.addSource(squaresSourceId, {
+      //   type: "geojson",
+      //   data: {
+      //     type: "FeatureCollection",
+      //     features: squares.map((square) => ({
+      //       type: "Feature",
+      //       properties: {
+      //         id: square._id,
+      //         color: territory?.group?.color,
+      //         number: `${territory?.number}${square.letter}`,
+      //       },
+      //       geometry: {
+      //         type: "Polygon",
+      //         coordinates: square.coordinates || [],
+      //       },
+      //     })),
+      //   },
+      // });
+
+      // // Adicionar o source de labels para os squares do território
+      // map.current.addSource(squaresLabelsSourceId, {
+      //   type: "geojson",
+      //   data: {
+      //     type: "FeatureCollection",
+      //     features: squares.map((square) => {
+      //       const center = turf.centroid({
+      //         type: "Feature",
+      //         properties: {},
+      //         geometry: { type: "Polygon", coordinates: square?.coordinates || [] },
+      //       }).geometry.coordinates;
+
+      //       return {
+      //         type: "Feature",
+      //         properties: {
+      //           number: `${territory?.number}${square.letter}` || "",
+      //           color: territory?.group?.color || "",
+      //         },
+      //         geometry: { type: "Point", coordinates: center },
+      //       };
+      //     }),
+      //   },
+      // });
+
+      // // Adicionar a camada de preenchimento das quadras para o território
+      // map.current.addLayer({
+      //   id: squaresFillId,
+      //   type: "fill",
+      //   source: squaresSourceId,
+      //   paint: {
+      //     "fill-color": ["get", "color"],
+      //     "fill-opacity": [
+      //       "step",
+      //       ["to-number", ["in", ["get", "id"], ["literal", squareList.map((sq) => sq.id)]]],
+      //       0.2,
+      //       1,
+      //       0.8,
+      //     ],
+      //   },
+      // });
+
+      // if (number) {
+      //   const doneSquaresList = territory?.doneSquaresList;
+      //   if (doneSquaresList && map.current!.getLayer(squaresFillId)) {
+      //     map.current.setPaintProperty(squaresFillId, "fill-opacity", [
+      //       "step",
+      //       ["to-number", ["in", ["get", "id"], ["literal", doneSquaresList]]],
+      //       0.2,
+      //       1,
+      //       0.8,
+      //     ]);
+      //   }
+      // }
+
+      // // Adicionar a camada das bordas dos squares para o território
+      // map.current.addLayer({
+      //   id: squaresOutlineId,
+      //   type: "line",
+      //   source: squaresSourceId,
+      //   paint: {
+      //     "line-color": ["get", "color"],
+      //     "line-width": 2,
+      //   },
+      // });
+
+      // // Adicionar a camada de números dos squares
+      // map.current.addLayer({
+      //   id: squaresNumberId,
+      //   type: "symbol",
+      //   source: squaresLabelsSourceId,
+      //   layout: {
+      //     "text-field": ["get", "number"],
+      //     "text-size": 18,
+      //     "text-font": ["Open Sans Bold"],
+      //     "text-anchor": "center",
+      //   },
+      //   paint: {
+      //     "text-color": ["get", "color"],
+      //     "text-halo-color": "#fefefe",
+      //     "text-halo-width": 1,
+      //   },
+      // });
+
+      // map.current.off("click", squaresFillId, handleSquareClick);
+      // map.current.off("touchend", squaresFillId, handleSquareClick);
+      // map.current.off("dblclick", squaresFillId, handleRemoveSquare);
+      // // Mudar cursor ao passar sobre os polígonos
+      // map.current.on("mouseenter", squaresFillId, () => {
+      //   map.current!.getCanvas().style.cursor = "pointer";
+      // });
+
+      // map.current.on("mouseleave", squaresFillId, () => {
+      //   map.current!.getCanvas().style.cursor = "";
+      // });
+
+      // // Eventos nas quadras
+      // if (number) {
+      //   map.current.on("click", squaresFillId, handleSquareClick);
+      //   map.current.on("touchend", squaresFillId, handleSquareClick);
+      // } else if (canEdit) {
+      //   // Eventos de remoção das quadras
+      //   map.current.on("dblclick", squaresFillId, handleRemoveSquare);
+      // }
     });
-  }, [territories, styleLoaded, isClient, isSuccess, isPending, mode]);
+
+    orphansSquares?.length &&
+      createSquares({
+        squares: orphansSquares,
+        id: "orphans",
+        number: "ORFÃO",
+        color: "#C5C5C5",
+        doneSquaresList: [],
+      });
+  }, [
+    territories,
+    styleLoaded,
+    isClient,
+    isSuccess,
+    isPending,
+    mode,
+    orphansSquares,
+    createSquares,
+  ]);
 
   //& ATUALIZAÇÃO DA OPACITY DAS QUADRAS
   const opacity = useMemo(() => {
@@ -544,7 +758,7 @@ function MapWithDraw({ canEdit }: { canEdit: boolean }) {
 
         // Verificação do modo para determinar se deve adicionar event listeners
         if (mode === "territory") {
-          console.log("Adicionando listeners de território");
+          // console.log("Adicionando listeners de território");
 
           map.current.on("mouseenter", "territories-fill", () => {
             map.current!.getCanvas().style.cursor = "pointer";
@@ -615,6 +829,7 @@ function MapWithDraw({ canEdit }: { canEdit: boolean }) {
   }, [
     territories,
     territories && territories[0],
+    orphansSquares,
     styleLoaded,
     isClient,
     isSuccess,

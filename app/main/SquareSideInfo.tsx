@@ -39,6 +39,7 @@ const SquareSideInfo = ({
   const coordinates = useStoreTerritory().coordinates;
 
   const { data, isLoading } = useSquares().getOne({ id, enabled: !!id && sideSquareInfoOpen });
+
   const [formData, setFormData] = useState<SquareProps>(initialFormValues);
   const {
     mutate: insertOne,
