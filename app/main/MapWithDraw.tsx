@@ -67,8 +67,8 @@ function MapWithDraw({ canEdit }: { canEdit: boolean }) {
     map.current = new mapboxgl.Map({
       container: mapContainer.current as HTMLElement,
       style: mapStyle,
-      center: [-29.942, -50.954],
-      zoom: 12.5,
+      center: [-50.950, -29.941], 
+      zoom: 13,
     });
 
     //* CONTROLES DO MAPA
